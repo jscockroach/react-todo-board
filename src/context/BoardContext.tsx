@@ -1,5 +1,5 @@
 
-import { createContext, useReducer, useEffect, type ReactNode } from "react";
+import { createContext, useReducer, useEffect, type Dispatch, type ReactNode } from "react";
 import { boardReducer, type BoardAction } from "../store/boardReducer";
 import { initialBoardState } from "../store/initialBoardState";
 import type { BoardState } from "../types/board";
@@ -50,7 +50,7 @@ function loadState(): BoardState {
 
 export interface BoardContextValue {
   state: BoardState;
-  dispatch: React.Dispatch<BoardAction>;
+  dispatch: Dispatch<BoardAction>;
 }
 
 export const BoardContext = createContext<BoardContextValue | null>(null);
