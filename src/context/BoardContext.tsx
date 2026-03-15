@@ -29,7 +29,13 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(boardReducer, undefined, loadState);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (typeof window === "undefined") return;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // Ignore write errors (e.g., quota exceeded or disabled storage) to keep UI functional
+    }
   }, [state]);
 
   return (
