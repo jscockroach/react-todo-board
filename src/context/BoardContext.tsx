@@ -6,16 +6,47 @@ import type { BoardState } from "../types/board";
 
 const STORAGE_KEY = "react-todo-board";
 
+function isValidBoardState(value: unknown): value is BoardState {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as {
+    tasks?: unknown;
+    columns?: unknown;
+    columnOrder?: unknown;
+  };
+
+  if (!candidate.tasks || typeof candidate.tasks !== "object") {
+    return false;
+  }
+
+  if (!candidate.columns || typeof candidate.columns !== "object") {
+    return false;
+  }
+
+  if (!Array.isArray(candidate.columnOrder)) {
+    return false;
+  }
+
+  return true;
+}
+
 function loadState(): BoardState {
-    if (typeof window === "undefined") return initialBoardState;
-  
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as BoardState) : initialBoardState;
-    } catch {
+  if (typeof window === "undefined") return initialBoardState;
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
       return initialBoardState;
     }
+
+    const parsed = JSON.parse(raw);
+    return isValidBoardState(parsed) ? parsed : initialBoardState;
+  } catch {
+    return initialBoardState;
   }
+}
 
 export interface BoardContextValue {
   state: BoardState;
