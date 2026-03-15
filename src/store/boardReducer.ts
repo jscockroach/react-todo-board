@@ -159,8 +159,21 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
     case "MOVE_COLUMN": {
       const { sourceIndex, destIndex } = action.payload;
       const newOrder = [...state.columnOrder];
-      const [movedColumnId] = newOrder.splice(sourceIndex, 1);
-      newOrder.splice(destIndex, 0, movedColumnId);
+      const movedColumnId = newOrder[sourceIndex];
+      // Guard against invalid source index
+      if (!movedColumnId) {
+        return state;
+      }
+      // Remove the column from its original position
+      newOrder.splice(sourceIndex, 1);
+      // Clamp destination index to valid range
+      let targetIndex = destIndex;
+      if (targetIndex < 0) {
+        targetIndex = 0;
+      } else if (targetIndex > newOrder.length) {
+        targetIndex = newOrder.length;
+      }
+      newOrder.splice(targetIndex, 0, movedColumnId);
       return { ...state, columnOrder: newOrder };
     }
 
