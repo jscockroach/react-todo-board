@@ -47,7 +47,8 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       );
       if (!column) return state;
 
-      const { [taskId]: _, ...remainingTasks } = state.tasks;
+      const remainingTasks = { ...state.tasks };
+      delete remainingTasks[taskId];
       return {
         ...state,
         tasks: remainingTasks,
