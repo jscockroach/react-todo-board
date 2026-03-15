@@ -63,13 +63,18 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
 
     case "TOGGLE_TASK": {
       const { taskId } = action.payload;
+      const task = state.tasks[taskId];
+      if (!task) {
+        // Task does not exist; no state change
+        return state;
+      }
       return {
         ...state,
         tasks: {
           ...state.tasks,
           [taskId]: {
-            ...state.tasks[taskId],
-            completed: !state.tasks[taskId].completed,
+            ...task,
+            completed: !task.completed,
           },
         },
       };
