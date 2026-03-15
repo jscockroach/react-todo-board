@@ -118,7 +118,11 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
 
     case "MOVE_TASK": {
       const { sourceColumnId, destColumnId, sourceIndex, destIndex } = action.payload;
-      const sourceTaskIds = [...state.columns[sourceColumnId].taskIds];
+      const sourceColumn = state.columns[sourceColumnId];
+      if (!sourceColumn) {
+        return state;
+      }
+      const sourceTaskIds = [...sourceColumn.taskIds];
 
       // Guard against invalid index
       const movedTaskId = sourceTaskIds[sourceIndex];
@@ -131,19 +135,23 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
           ...state,
           columns: {
             ...state.columns,
-            [sourceColumnId]: { ...state.columns[sourceColumnId], taskIds: sourceTaskIds },
+            [sourceColumnId]: { ...sourceColumn, taskIds: sourceTaskIds },
           },
         };
       }
 
-      const destTaskIds = [...state.columns[destColumnId].taskIds];
+      const destColumn = state.columns[destColumnId];
+      if (!destColumn) {
+        return state;
+      }
+      const destTaskIds = [...destColumn.taskIds];
       destTaskIds.splice(destIndex, 0, movedTaskId);
       return {
         ...state,
         columns: {
           ...state.columns,
-          [sourceColumnId]: { ...state.columns[sourceColumnId], taskIds: sourceTaskIds },
-          [destColumnId]: { ...state.columns[destColumnId], taskIds: destTaskIds },
+          [sourceColumnId]: { ...sourceColumn, taskIds: sourceTaskIds },
+          [destColumnId]: { ...destColumn, taskIds: destTaskIds },
         },
       };
     }
