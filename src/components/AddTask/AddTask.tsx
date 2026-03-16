@@ -1,7 +1,6 @@
-
-import React, { useState } from "react";
-import { useBoardState } from "../../hooks/useBoardState";
-import styles from "./AddTask.module.css";
+import React, { useState } from 'react';
+import { useBoardState } from '../../hooks/useBoardState';
+import styles from './AddTask.module.css';
 
 interface AddTaskProps {
   columnId: string;
@@ -10,15 +9,23 @@ interface AddTaskProps {
 /** Inline form that adds a new task to the specified column. */
 export const AddTask: React.FC<AddTaskProps> = ({ columnId }) => {
   const { dispatch } = useBoardState();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    dispatch({ type: "ADD_TASK", payload: { columnId, title: trimmed } });
-    setTitle("");
+    const newTask = {
+      id:
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : Date.now().toString(),
+      title: trimmed,
+      completed: false,
+    };
+    dispatch({ type: 'ADD_TASK', payload: { columnId, task: newTask } });
+    setTitle('');
     setIsOpen(false);
   };
 
@@ -39,7 +46,7 @@ export const AddTask: React.FC<AddTaskProps> = ({ columnId }) => {
         placeholder="Task title…"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        onKeyDown={(e) => e.key === "Escape" && setIsOpen(false)}
+        onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
       />
       <div className={styles.actions}>
         <button type="submit" className={styles.confirmBtn}>

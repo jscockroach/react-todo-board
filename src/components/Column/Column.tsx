@@ -1,10 +1,9 @@
-
-import React from "react";
-import type { Column as ColumnType, Task } from "../../types/board";
-import { useBoardState } from "../../hooks/useBoardState";
-import { TaskCard } from "../TaskCard/TaskCard";
-import { AddTask } from "../AddTask/AddTask";
-import styles from "./Column.module.css";
+import React from 'react';
+import type { Column as ColumnType, Task } from '../../types/board';
+import { useBoardState } from '../../hooks/useBoardState';
+import { TaskCard } from '../TaskCard/TaskCard';
+import { AddTask } from '../AddTask/AddTask';
+import styles from './Column.module.css';
 
 interface ColumnProps {
   column: ColumnType;
@@ -16,7 +15,7 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const { dispatch } = useBoardState();
 
   const handleDeleteColumn = () => {
-    dispatch({ type: "DELETE_COLUMN", payload: { columnId: column.id } });
+    dispatch({ type: 'DELETE_COLUMN', payload: { columnId: column.id } });
   };
 
   return (
@@ -35,7 +34,7 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
 
       <div className={styles.taskList}>
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} columnId={column.id} />
+          <TaskCard key={task.id} task={task} />
         ))}
       </div>
 

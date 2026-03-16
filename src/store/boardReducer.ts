@@ -1,14 +1,14 @@
-import type { BoardState, Task, Column } from "../types/board";
+import type { BoardState, Task, Column } from '../types/board';
 
 export type BoardAction =
-  | { type: "ADD_TASK"; payload: { columnId: string; task: Task } }
-  | { type: "DELETE_TASK"; payload: { taskId: string } }
-  | { type: "TOGGLE_TASK"; payload: { taskId: string } }
-  | { type: "EDIT_TASK"; payload: { taskId: string; title: string } }
-  | { type: "ADD_COLUMN"; payload: { column: Column } }
-  | { type: "DELETE_COLUMN"; payload: { columnId: string } }
+  | { type: 'ADD_TASK'; payload: { columnId: string; task: Task } }
+  | { type: 'DELETE_TASK'; payload: { taskId: string } }
+  | { type: 'TOGGLE_TASK'; payload: { taskId: string } }
+  | { type: 'EDIT_TASK'; payload: { taskId: string; title: string } }
+  | { type: 'ADD_COLUMN'; payload: { column: Column } }
+  | { type: 'DELETE_COLUMN'; payload: { columnId: string } }
   | {
-      type: "MOVE_TASK";
+      type: 'MOVE_TASK';
       payload: {
         sourceColumnId: string;
         destColumnId: string;
@@ -16,11 +16,17 @@ export type BoardAction =
         destIndex: number;
       };
     }
-  | { type: "MOVE_COLUMN"; payload: { sourceIndex: number; destIndex: number } };
+  | {
+      type: 'MOVE_COLUMN';
+      payload: { sourceIndex: number; destIndex: number };
+    };
 
-export function boardReducer(state: BoardState, action: BoardAction): BoardState {
+export function boardReducer(
+  state: BoardState,
+  action: BoardAction,
+): BoardState {
   switch (action.type) {
-    case "ADD_TASK": {
+    case 'ADD_TASK': {
       const { columnId, task } = action.payload;
       const column = state.columns[columnId];
       if (!column) {
@@ -39,11 +45,11 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "DELETE_TASK": {
+    case 'DELETE_TASK': {
       const { taskId } = action.payload;
       // Find the column that contains this task
       const column = Object.values(state.columns).find((col) =>
-        col.taskIds.includes(taskId)
+        col.taskIds.includes(taskId),
       );
       if (!column) return state;
 
@@ -62,7 +68,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "TOGGLE_TASK": {
+    case 'TOGGLE_TASK': {
       const { taskId } = action.payload;
       const task = state.tasks[taskId];
       if (!task) {
@@ -81,7 +87,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "EDIT_TASK": {
+    case 'EDIT_TASK': {
       const { taskId, title } = action.payload;
       const task = state.tasks[taskId];
       if (!task) {
@@ -97,7 +103,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "ADD_COLUMN": {
+    case 'ADD_COLUMN': {
       const { column } = action.payload;
       return {
         ...state,
@@ -106,12 +112,12 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "DELETE_COLUMN": {
+    case 'DELETE_COLUMN': {
       const { columnId } = action.payload;
       // Remove all tasks belonging to this column
       const taskIdsToRemove = new Set(state.columns[columnId]?.taskIds ?? []);
       const remainingTasks = Object.fromEntries(
-        Object.entries(state.tasks).filter(([id]) => !taskIdsToRemove.has(id))
+        Object.entries(state.tasks).filter(([id]) => !taskIdsToRemove.has(id)),
       );
       const { [columnId]: _, ...remainingColumns } = state.columns;
       return {
@@ -122,8 +128,9 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "MOVE_TASK": {
-      const { sourceColumnId, destColumnId, sourceIndex, destIndex } = action.payload;
+    case 'MOVE_TASK': {
+      const { sourceColumnId, destColumnId, sourceIndex, destIndex } =
+        action.payload;
       const sourceColumn = state.columns[sourceColumnId];
       if (!sourceColumn) {
         return state;
@@ -162,7 +169,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
       };
     }
 
-    case "MOVE_COLUMN": {
+    case 'MOVE_COLUMN': {
       const { sourceIndex, destIndex } = action.payload;
       const newOrder = [...state.columnOrder];
       const movedColumnId = newOrder[sourceIndex];

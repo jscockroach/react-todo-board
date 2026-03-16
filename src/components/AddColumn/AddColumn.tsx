@@ -1,20 +1,24 @@
-
-import React, { useState } from "react";
-import { useBoardState } from "../../hooks/useBoardState";
-import styles from "./AddColumn.module.css";
+import React, { useState } from 'react';
+import { useBoardState } from '../../hooks/useBoardState';
+import styles from './AddColumn.module.css';
 
 /** Renders a button/form to add a new column to the board. */
 export const AddColumn: React.FC = () => {
   const { dispatch } = useBoardState();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    dispatch({ type: "ADD_COLUMN", payload: { title: trimmed } });
-    setTitle("");
+    const newColumn = {
+      id: crypto.randomUUID(),
+      title: trimmed,
+      taskIds: [],
+    };
+    dispatch({ type: 'ADD_COLUMN', payload: { column: newColumn } });
+    setTitle('');
     setIsOpen(false);
   };
 
@@ -36,7 +40,7 @@ export const AddColumn: React.FC = () => {
           placeholder="Column title…"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={(e) => e.key === "Escape" && setIsOpen(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
         />
         <div className={styles.actions}>
           <button type="submit" className={styles.confirmBtn}>
