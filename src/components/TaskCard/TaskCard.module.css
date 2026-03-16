@@ -1,23 +1,29 @@
-
 .card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #f8f9fb;
-  border: 1px solid #e8eaed;
-  border-radius: 8px;
-  padding: 10px 12px;
-  transition: box-shadow 0.2s, opacity 0.2s;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Visually dim completed tasks */
 .completed {
-  opacity: 0.6;
-  background: #f0f4f0;
-  border-color: #c8dfc8;
+  opacity: 0.55;
+}
+
+.completed .title {
+  text-decoration: line-through;
+  color: #888;
 }
 
 .checkLabel {
@@ -30,37 +36,49 @@
 }
 
 .checkbox {
+  flex-shrink: 0;
   width: 16px;
   height: 16px;
-  flex-shrink: 0;
-  accent-color: #4caf50;
   cursor: pointer;
+  accent-color: #4a90d9;
 }
 
 .title {
+  flex: 1;
   font-size: 0.9rem;
-  color: #333;
+  color: #222;
   word-break: break-word;
+  cursor: default;
+  user-select: none;
 }
 
-.completed .title {
-  text-decoration: line-through;
-  color: #888;
+.editInput {
+  flex: 1;
+  font-size: 0.9rem;
+  padding: 2px 6px;
+  border: 1px solid #4a90d9;
+  border-radius: 4px;
+  outline: none;
+  background: #f0f7ff;
+  color: #222;
 }
 
 .deleteBtn {
+  flex-shrink: 0;
   background: none;
   border: none;
-  cursor: pointer;
   color: #bbb;
   font-size: 0.8rem;
-  padding: 2px 6px;
+  cursor: pointer;
+  padding: 2px 4px;
   border-radius: 4px;
-  flex-shrink: 0;
-  transition: color 0.2s, background 0.2s;
+  line-height: 1;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 }
 
 .deleteBtn:hover {
-  color: #e74c3c;
+  color: #e53935;
   background: #fdecea;
 }
