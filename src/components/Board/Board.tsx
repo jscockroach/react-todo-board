@@ -59,7 +59,9 @@ export const Board: React.FC = () => {
           if (destIndex === -1) return;
 
           // Adjust index based on which edge the task was dropped on
-          const edge = extractClosestEdge(innerData);
+          const edge = extractClosestEdge(
+            innerData as unknown as Record<string | symbol, unknown>,
+          );
           if (edge === 'bottom') destIndex += 1;
 
           // Normalize for same-column: after removing source, indices shift

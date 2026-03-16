@@ -10,6 +10,7 @@
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "preview": "vite preview",
     "prepare": "husky"
   },
@@ -37,6 +38,9 @@
     "vite": "^8.0.0"
   },
   "lint-staged": {
-    "**/*.{ts,tsx}": "eslint --max-warnings=0"
+    "**/*.{ts,tsx}": [
+      "eslint --max-warnings=0",
+      "bash -c 'tsc --noEmit -p tsconfig.app.json'"
+    ]
   }
 }
