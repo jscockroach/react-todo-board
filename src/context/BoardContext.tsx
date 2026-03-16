@@ -65,8 +65,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   }, [state]);
   return (
     <BoardContext.Provider value={{ state, dispatch }}>
-      {' '}
-      {children}{' '}
+      {children}
     </BoardContext.Provider>
   );
 }
