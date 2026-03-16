@@ -10,6 +10,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.column.dragging {
+  opacity: 0.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.column.columnDragOver {
+  outline: 2px dashed #4a6cf7;
+  background: #f5f7ff;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -50,4 +60,12 @@
   gap: 8px;
   flex: 1;
   min-height: 40px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  padding: 2px 0;
+}
+
+.taskList.dragOver {
+  background: #f0f4ff;
+  outline: 2px dashed #a0aff0;
 }
