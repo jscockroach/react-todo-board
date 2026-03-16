@@ -1,11 +1,15 @@
-import './App.css'
+import './App.css';
+import { Board } from './components/Board/Board';
+import { BoardProvider } from './context/BoardContext';
 
 function App() {
   return (
     <>
-      start point
+      <BoardProvider>
+        <Board />
+      </BoardProvider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
