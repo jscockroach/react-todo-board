@@ -1,0 +1,11 @@
+
+.board {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  overflow-x: auto;
+  min-height: 100vh;
+  background: #f0f2f5;
+}

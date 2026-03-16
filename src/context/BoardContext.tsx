@@ -1,13 +1,15 @@
+import { useReducer, useEffect, type ReactNode } from 'react';
+import { boardReducer } from '../store/boardReducer';
+import { initialBoardState } from '../store/initialBoardState';
+import type { BoardState } from '../types/board';
+import { BoardContext } from './BoardContextDef';
 
-import { createContext, useReducer, useEffect, type Dispatch, type ReactNode } from "react";
-import { boardReducer, type BoardAction } from "../store/boardReducer";
-import { initialBoardState } from "../store/initialBoardState";
-import type { BoardState } from "../types/board";
+export { BoardContext, type BoardContextValue } from './BoardContextDef';
 
-const STORAGE_KEY = "react-todo-board";
+const STORAGE_KEY = 'react-todo-board';
 
 function isValidBoardState(value: unknown): value is BoardState {
-  if (!value || typeof value !== "object") {
+  if (!value || typeof value !== 'object') {
     return false;
   }
 
@@ -17,11 +19,11 @@ function isValidBoardState(value: unknown): value is BoardState {
     columnOrder?: unknown;
   };
 
-  if (!candidate.tasks || typeof candidate.tasks !== "object") {
+  if (!candidate.tasks || typeof candidate.tasks !== 'object') {
     return false;
   }
 
-  if (!candidate.columns || typeof candidate.columns !== "object") {
+  if (!candidate.columns || typeof candidate.columns !== 'object') {
     return false;
   }
 
@@ -33,7 +35,7 @@ function isValidBoardState(value: unknown): value is BoardState {
 }
 
 function loadState(): BoardState {
-  if (typeof window === "undefined") return initialBoardState;
+  if (typeof window === 'undefined') return initialBoardState;
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -48,19 +50,12 @@ function loadState(): BoardState {
   }
 }
 
-export interface BoardContextValue {
-  state: BoardState;
-  dispatch: Dispatch<BoardAction>;
-}
-
-export const BoardContext = createContext<BoardContextValue | null>(null);
-
 /** Provides board state and dispatch to the entire component tree */
 export function BoardProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(boardReducer, undefined, loadState);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -68,7 +63,6 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       // Ignore write errors (e.g., quota exceeded or disabled storage) to keep UI functional
     }
   }, [state]);
-
   return (
     <BoardContext.Provider value={{ state, dispatch }}>
       {children}
