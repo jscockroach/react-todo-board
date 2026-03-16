@@ -26,15 +26,6 @@
   color: #888;
 }
 
-.checkLabel {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  flex: 1;
-  min-width: 0;
-}
-
 .checkbox {
   flex-shrink: 0;
   width: 16px;
