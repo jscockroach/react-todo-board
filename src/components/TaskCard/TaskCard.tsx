@@ -34,6 +34,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     });
   };
 
+  const startEditing = () => {
+    setDraft(task.title);
+    setIsEditing(true);
+  };
+
   const commitEdit = () => {
     const trimmed = draft.trim();
     if (trimmed && trimmed !== task.title) {
@@ -54,6 +59,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     } else if (e.key === 'Escape') {
       setDraft(task.title);
       setIsEditing(false);
+    }
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      startEditing();
     }
   };
 
@@ -82,11 +94,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       ) : (
         <span
           className={styles.title}
-          onDoubleClick={() => {
-            setDraft(task.title);
-            setIsEditing(true);
-          }}
-          title="Double-click to edit"
+          tabIndex={0}
+          role="button"
+          onDoubleClick={startEditing}
+          onKeyDown={handleTitleKeyDown}
+          title="Double-click or press Enter/Space to edit"
         >
           {task.title}
         </span>
