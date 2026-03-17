@@ -1,5 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   draggable,
   dropTargetForElements,
@@ -10,6 +9,7 @@ import { isTaskDragData } from '../TaskCard/TaskCard';
 import { AddTask } from '../AddTask/AddTask';
 import type { Column as ColumnType, Task } from '../../types/board';
 import styles from './Column.module.css';
+import { useFilter } from '../../context/FilterContext';
 
 interface ColumnProps {
   column: ColumnType;
@@ -46,6 +46,21 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const [isColumnDragging, setIsColumnDragging] = useState(false);
   const columnRef = useRef<HTMLDivElement>(null);
   const taskListRef = useRef<HTMLDivElement>(null);
+  const { searchQuery, statusFilter } = useFilter();
+
+  const filteredTasks = useMemo(
+    () =>
+      tasks.filter((task) => {
+        const matchesSearch = task.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (statusFilter === 'active' ? !task.completed : task.completed);
+        return matchesSearch && matchesStatus;
+      }),
+    [tasks, searchQuery, statusFilter],
+  );
 
   /** Make the column draggable. */
   useEffect(() => {
@@ -136,7 +151,7 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
           .filter(Boolean)
           .join(' ')}
       >
-        {tasks.map((task) => (
+        {filteredTasks.map((task) => (
           <TaskCard key={task.id} task={task} columnId={column.id} />
         ))}
       </div>

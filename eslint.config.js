@@ -28,6 +28,7 @@ export default defineConfig([
           ignoreRestSiblings: true,
         },
       ],
+      'react-refresh/only-export-components': 'off',
     },
   },
 ]);
