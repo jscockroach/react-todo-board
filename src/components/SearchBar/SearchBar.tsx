@@ -28,6 +28,7 @@ export const SearchBar: React.FC = () => {
       />
       {inputValue && (
         <button
+          type="button"
           className={styles.clearButton}
           onClick={handleClear}
           aria-label="Clear search"
