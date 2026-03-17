@@ -1,16 +1,23 @@
 import React from 'react';
 import { useSelection } from '../../hooks/useSelection';
 import { useBoardState } from '../../hooks/useBoardState';
+import { useConfirm } from '../../hooks/useConfirm';
+
 import styles from './BulkActionBar.module.css';
 
 export const BulkActionBar: React.FC = () => {
   const { selectedTaskIds, clearSelection } = useSelection();
   const { state, dispatch } = useBoardState();
+  const { confirm } = useConfirm();
 
   const count = selectedTaskIds.size;
   const visible = count > 0;
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
+    const ok = await confirm({
+      message: `Delete ${count} selected task${count !== 1 ? 's' : ''}? This cannot be undone.`,
+    });
+    if (!ok) return;
     const ids = Array.from(selectedTaskIds);
     dispatch({ type: 'DELETE_SELECTED', payload: { taskIds: ids } });
     clearSelection();
@@ -27,10 +34,6 @@ export const BulkActionBar: React.FC = () => {
     dispatch({ type: 'MOVE_SELECTED', payload: { taskIds: ids, toColumnId } });
     clearSelection();
   };
-
-  if (!visible) {
-    return null;
-  }
 
   return (
     <div

@@ -21,11 +21,11 @@
 }
 
 .active {
-  background: #333;
+  background: #4a90e2;
   color: white;
-  border-color: #333;
+  border-color: #4a90e2;
 }
 
 .active:hover {
-  background: #555;
+  background: #357abd;
 }

@@ -56,3 +56,11 @@ export interface FilterContextValue {
   statusFilter: StatusFilter;
   setStatusFilter: (filter: StatusFilter) => void;
 }
+
+export interface ConfirmOptions {
+  message: string;
+}
+
+export interface ConfirmModalContextValue {
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
+}

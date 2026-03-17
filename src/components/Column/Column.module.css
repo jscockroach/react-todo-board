@@ -83,3 +83,11 @@
   accent-color: #4a90e2;
   flex-shrink: 0;
 }
+
+@media (max-width: 600px) {
+  .column {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+  }
+}
