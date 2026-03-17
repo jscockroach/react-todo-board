@@ -4,6 +4,8 @@ import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { useBoardState } from '../../hooks/useBoardState';
 import { Column } from '../Column/Column';
 import { AddColumn } from '../AddColumn/AddColumn';
+import { SearchBar } from '../SearchBar/SearchBar';
+import { Filter } from '../Filter/Filter';
 import { isTaskDragData } from '../TaskCard/TaskCard';
 import { isColumnDropData, isColumnDragData } from '../Column/Column';
 import styles from './Board.module.css';
@@ -118,18 +120,24 @@ export const Board: React.FC = () => {
 
   return (
     <div className={styles.board}>
-      {state.columnOrder.map((columnId) => {
-        const column = state.columns[columnId];
-        if (!column) {
-          // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
-          return null;
-        }
-        const tasks = column.taskIds
-          .map((taskId) => state.tasks[taskId])
-          .filter(Boolean);
-        return <Column key={columnId} column={column} tasks={tasks} />;
-      })}
-      <AddColumn />
+      <div className={styles.toolbar}>
+        <SearchBar />
+        <Filter />
+      </div>
+      <div className={styles.columns}>
+        {state.columnOrder.map((columnId) => {
+          const column = state.columns[columnId];
+          if (!column) {
+            // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
+            return null;
+          }
+          const tasks = column.taskIds
+            .map((taskId) => state.tasks[taskId])
+            .filter(Boolean);
+          return <Column key={columnId} column={column} tasks={tasks} />;
+        })}
+        <AddColumn />
+      </div>
     </div>
   );
 };

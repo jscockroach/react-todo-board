@@ -40,3 +40,12 @@ export type BoardAction =
       type: 'MOVE_COLUMN';
       payload: { sourceIndex: number; destIndex: number };
     };
+
+export type StatusFilter = 'all' | 'active' | 'completed';
+
+export interface FilterContextValue {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  statusFilter: StatusFilter;
+  setStatusFilter: (filter: StatusFilter) => void;
+}
