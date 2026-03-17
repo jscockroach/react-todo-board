@@ -1,6 +1,6 @@
 import React from 'react';
 import type { StatusFilter } from '../../types/board';
-import { useFilter } from '../../context/FilterContext';
+import { useFilter } from '../../hooks/useFilter';
 import styles from './Filter.module.css';
 
 const OPTIONS: { label: string; value: StatusFilter }[] = [

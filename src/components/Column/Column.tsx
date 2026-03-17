@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   draggable,
@@ -7,9 +8,11 @@ import { useBoardState } from '../../hooks/useBoardState';
 import { TaskCard } from '../TaskCard/TaskCard';
 import { isTaskDragData } from '../TaskCard/TaskCard';
 import { AddTask } from '../AddTask/AddTask';
+import { useFilter } from '../../hooks/useFilter';
+
 import type { Column as ColumnType, Task } from '../../types/board';
+
 import styles from './Column.module.css';
-import { useFilter } from '../../context/FilterContext';
 
 interface ColumnProps {
   column: ColumnType;
