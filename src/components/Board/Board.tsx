@@ -105,7 +105,13 @@ export const Board: React.FC = () => {
     <div className={styles.board}>
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
-        const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
+        if (!column) {
+          // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
+          return null;
+        }
+        const tasks = column.taskIds
+          .map((taskId) => state.tasks[taskId])
+          .filter(Boolean);
         return <Column key={columnId} column={column} tasks={tasks} />;
       })}
       <AddColumn />
