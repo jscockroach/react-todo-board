@@ -11,22 +11,19 @@ export const BulkActionBar: React.FC = () => {
   const visible = count > 0;
 
   const handleDeleteSelected = () => {
-    const ids = Array.from(selectedTaskIds); // snapshot before clear
-    console.log('[BulkActionBar] DELETE_SELECTED', ids);
+    const ids = Array.from(selectedTaskIds);
     dispatch({ type: 'DELETE_SELECTED', payload: { taskIds: ids } });
     clearSelection();
   };
 
   const handleMarkComplete = () => {
     const ids = Array.from(selectedTaskIds);
-    console.log('[BulkActionBar] MARK_SELECTED_COMPLETE', ids);
     dispatch({ type: 'MARK_SELECTED_COMPLETE', payload: { taskIds: ids } });
     clearSelection();
   };
 
   const handleMoveTo = (toColumnId: string) => {
     const ids = Array.from(selectedTaskIds);
-    console.log('[BulkActionBar] MOVE_SELECTED', ids, '->', toColumnId);
     dispatch({ type: 'MOVE_SELECTED', payload: { taskIds: ids, toColumnId } });
     clearSelection();
   };
