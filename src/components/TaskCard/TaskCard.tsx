@@ -212,6 +212,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       return;
     }
 
+    // When selection mode is active, title clicks should manage selection,
+    // not toggle completion.
+    if (selectedTaskIds.size > 0) {
+      toggleTaskSelection(task.id);
+      return;
+    }
+
     // Delay single-click action to wait and see if dblclick follows
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
     clickTimerRef.current = setTimeout(() => {
