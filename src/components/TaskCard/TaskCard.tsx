@@ -145,6 +145,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                 setIsEditing(false);
               }
             }}
+            aria-label={`Edit title for task "${task.title}"`}
           />
         ) : (
           <span
