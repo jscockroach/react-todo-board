@@ -4,14 +4,16 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
   switch (action.type) {
     case 'ADD_TASK': {
       const { columnId, task } = action.payload;
+      const column = state.columns[columnId];
+      if (!column) return state;
       return {
         ...state,
         tasks: { ...state.tasks, [task.id]: task },
         columns: {
           ...state.columns,
           [columnId]: {
-            ...state.columns[columnId],
-            taskIds: [...state.columns[columnId].taskIds, task.id],
+            ...column,
+            taskIds: [...column.taskIds, task.id],
           },
         },
       };
@@ -90,10 +92,21 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
       if (!sourceCol || !destCol) return state;
 
       const sourceTasks = [...sourceCol.taskIds];
+      const sourceLength = sourceTasks.length;
+      if (sourceIndex < 0 || sourceIndex >= sourceLength) {
+        return state;
+      }
       const [movedTaskId] = sourceTasks.splice(sourceIndex, 1);
+      if (movedTaskId === undefined) {
+        return state;
+      }
 
       if (sourceColumnId === destColumnId) {
-        sourceTasks.splice(destIndex, 0, movedTaskId);
+        const clampedDestIndex = Math.max(
+          0,
+          Math.min(destIndex, sourceTasks.length),
+        );
+        sourceTasks.splice(clampedDestIndex, 0, movedTaskId);
         return {
           ...state,
           columns: {
@@ -104,7 +117,11 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
       }
 
       const destTasks = [...destCol.taskIds];
-      destTasks.splice(destIndex, 0, movedTaskId);
+      const clampedDestIndex = Math.max(
+        0,
+        Math.min(destIndex, destTasks.length),
+      );
+      destTasks.splice(clampedDestIndex, 0, movedTaskId);
       return {
         ...state,
         columns: {
@@ -118,8 +135,19 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
     case 'MOVE_COLUMN': {
       const { sourceIndex, destIndex } = action.payload;
       const newOrder = [...state.columnOrder];
+      const length = newOrder.length;
+      if (sourceIndex < 0 || sourceIndex >= length) {
+        return state;
+      }
       const [moved] = newOrder.splice(sourceIndex, 1);
-      newOrder.splice(destIndex, 0, moved);
+      if (moved === undefined) {
+        return state;
+      }
+      const clampedDestIndex = Math.max(
+        0,
+        Math.min(destIndex, newOrder.length),
+      );
+      newOrder.splice(clampedDestIndex, 0, moved);
       return { ...state, columnOrder: newOrder };
     }
 

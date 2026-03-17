@@ -31,6 +31,80 @@ export const isTaskDragData = (
   data: Record<string, unknown>,
 ): data is TaskDragData => data.type === 'task';
 
+// Global Ctrl/Cmd tracking shared across all TaskCard instances to avoid
+// registering duplicate window listeners per card.
+let globalIsCtrlMetaPressed = false;
+const ctrlMetaSubscribers = new Set<(pressed: boolean) => void>();
+let ctrlMetaListenersAttached = false;
+
+const notifyCtrlMetaSubscribers = (pressed: boolean) => {
+  if (globalIsCtrlMetaPressed === pressed) {
+    return;
+  }
+  globalIsCtrlMetaPressed = pressed;
+  ctrlMetaSubscribers.forEach((callback) => {
+    callback(pressed);
+  });
+};
+
+const handleCtrlMetaKey = (event: KeyboardEvent) => {
+  // Use the event's modifier flags so we correctly detect both Ctrl (Windows/Linux)
+  // and Cmd/Meta (macOS).
+  const pressed = event.ctrlKey || event.metaKey;
+  notifyCtrlMetaSubscribers(pressed);
+};
+
+const ensureCtrlMetaListeners = () => {
+  if (ctrlMetaListenersAttached) {
+    return;
+  }
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.addEventListener('keydown', handleCtrlMetaKey);
+  window.addEventListener('keyup', handleCtrlMetaKey);
+  ctrlMetaListenersAttached = true;
+};
+
+const teardownCtrlMetaListenersIfUnused = () => {
+  if (!ctrlMetaListenersAttached) {
+    return;
+  }
+  if (ctrlMetaSubscribers.size > 0) {
+    return;
+  }
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.removeEventListener('keydown', handleCtrlMetaKey);
+  window.removeEventListener('keyup', handleCtrlMetaKey);
+  ctrlMetaListenersAttached = false;
+};
+
+const subscribeToCtrlMeta = (callback: (pressed: boolean) => void) => {
+  ctrlMetaSubscribers.add(callback);
+  // Immediately sync with current global state.
+  callback(globalIsCtrlMetaPressed);
+  ensureCtrlMetaListeners();
+  return () => {
+    ctrlMetaSubscribers.delete(callback);
+    teardownCtrlMetaListenersIfUnused();
+  };
+};
+
+const useGlobalCtrlMetaPressed = (): boolean => {
+  const [pressed, setPressed] = useState<boolean>(globalIsCtrlMetaPressed);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToCtrlMeta(setPressed);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return pressed;
+};
+
 /** Renders a single task card with inline editing, completion toggle, delete, and drag support. */
 export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const { dispatch } = useBoardState();
@@ -40,26 +114,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isCtrlPressed = useGlobalCtrlMetaPressed();
 
   const selected = isSelected(task.id);
   const selectionMode = selectedTaskIds.size > 0;
   const checkboxVisible = selectionMode || (isHovered && isCtrlPressed);
-
-  // Track Ctrl/Cmd globally so it works even without mouse movement
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) =>
-      setIsCtrlPressed(e.ctrlKey || e.metaKey);
-    window.addEventListener('keydown', handleKey);
-    window.addEventListener('keyup', handleKey);
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      window.removeEventListener('keyup', handleKey);
-    };
-  }, []);
 
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
@@ -168,6 +230,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     setIsEditing(true);
   };
 
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div ref={wrapperRef} className={styles.wrapper}>
       {closestEdge && (
@@ -242,6 +313,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                 : 'Click to complete · Double-click to edit'
             }
             role="button"
+            aria-pressed={task.completed}
+            aria-label={
+              task.completed
+                ? `Mark task "${task.title}" as active`
+                : `Mark task "${task.title}" as completed`
+            }
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
