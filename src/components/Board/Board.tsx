@@ -122,7 +122,7 @@ export const Board: React.FC = () => {
 
   return (
     <SelectionProvider>
-      <div className={styles.boardContainer}>
+      <div className={styles.board}>
         <BulkActionBar />
         <div className={styles.toolbar}>
           <SearchBar />
