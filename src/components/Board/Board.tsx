@@ -36,8 +36,15 @@ export const Board: React.FC = () => {
           if (sourceColumnId === targetColumnId) return;
 
           const sourceIndex = currentState.columnOrder.indexOf(sourceColumnId);
-          const destIndex = currentState.columnOrder.indexOf(targetColumnId);
+          let destIndex = currentState.columnOrder.indexOf(targetColumnId);
           if (sourceIndex === -1 || destIndex === -1) return;
+
+          // When reordering within the same array, removing the source first
+          // shifts indices down. If moving forward, adjust destIndex so that
+          // dropping "on" a column yields consistent placement semantics.
+          if (sourceIndex < destIndex) {
+            destIndex -= 1;
+          }
 
           dispatch({
             type: 'MOVE_COLUMN',
