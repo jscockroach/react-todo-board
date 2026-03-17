@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   draggable,
   dropTargetForElements,
-  monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import {
   attachClosestEdge,
@@ -66,19 +65,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       canDrop: ({ source }) =>
         isTaskDragData(source.data as Record<string, unknown>) &&
         source.data.taskId !== task.id,
+      onDragEnter({ self }) {
+        setClosestEdge(extractClosestEdge(self.data));
+      },
       onDrag({ self }) {
         setClosestEdge(extractClosestEdge(self.data));
       },
-      onDrop: () => setClosestEdge(null),
-    });
-
-    /** Clear indicator when the drag moves away from this card entirely. */
-    const cleanupMonitor = monitorForElements({
-      onDrag({ location }) {
-        const isOver = location.current.dropTargets.some(
-          (t) => t.element === el,
-        );
-        if (!isOver) setClosestEdge(null);
+      onDragLeave() {
+        setClosestEdge(null);
       },
       onDrop() {
         setClosestEdge(null);
@@ -88,7 +82,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     return () => {
       cleanupDraggable();
       cleanupDropTarget();
-      cleanupMonitor();
     };
   }, [task.id, columnId]);
 
