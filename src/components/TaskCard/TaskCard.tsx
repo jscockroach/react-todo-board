@@ -152,6 +152,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
             className={styles.title}
             onDoubleClick={() => !task.completed && setIsEditing(true)}
             title={task.completed ? undefined : 'Double-click to edit'}
+            role={task.completed ? undefined : 'button'}
+            tabIndex={task.completed ? -1 : 0}
+            onKeyDown={(e) => {
+              if (task.completed) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsEditing(true);
+              }
+            }}
           >
             {task.title}
           </span>
