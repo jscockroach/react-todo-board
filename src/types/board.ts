@@ -39,13 +39,20 @@ export type BoardAction =
   | {
       type: 'MOVE_COLUMN';
       payload: { sourceIndex: number; destIndex: number };
+    }
+  | { type: 'DELETE_SELECTED'; payload: { taskIds: string[] } }
+  | { type: 'MARK_SELECTED_COMPLETE'; payload: { taskIds: string[] } }
+  | {
+      type: 'MOVE_SELECTED';
+      payload: { taskIds: string[]; toColumnId: string };
     };
 
 export type StatusFilter = 'all' | 'active' | 'completed';
 
 export interface FilterContextValue {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  rawSearchQuery: string;
+  debouncedSearchQuery: string;
+  setRawSearchQuery: (query: string) => void;
   statusFilter: StatusFilter;
   setStatusFilter: (filter: StatusFilter) => void;
 }

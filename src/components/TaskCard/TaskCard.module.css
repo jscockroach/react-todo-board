@@ -1,22 +1,86 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 4px 0;
+  margin: -4px 0;
+}
+
 .card {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 4px;
+  padding: 10px 10px 10px 8px;
   background: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
   transition:
-    box-shadow 0.15s ease,
-    opacity 0.15s ease;
+    box-shadow 0.15s,
+    opacity 0.15s,
+    border-color 0.15s;
+  user-select: none;
 }
 
 .card:hover {
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #c0c0c0;
 }
 
-/* Visually dim completed tasks */
+/* Fixed-width container — always present, prevents layout shift */
+.checkboxContainer {
+  flex-shrink: 0;
+  width: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.2s ease,
+    width 0.2s ease;
+  /* pointer-events off when hidden so it doesn't intercept clicks */
+  pointer-events: none;
+}
+
+/* Faintly visible on any card hover — helps discoverability */
+.card:hover .checkboxContainer {
+  width: 24px;
+  opacity: 0.25;
+  pointer-events: auto;
+}
+
+/* Fully visible when Ctrl held or selection mode active */
+.checkboxContainer.checkboxVisible {
+  width: 30px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.selectionCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4a90e2;
+}
+
+.checkbox {
+  /* kept for reference — no longer used for completion */
+  display: none;
+}
+
+.title {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  word-break: break-word;
+  line-height: 1.4;
+  transition: color 0.15s;
+  cursor: text;
+}
+
+/* Completed state */
 .completed {
   opacity: 0.55;
 }
@@ -26,47 +90,48 @@
   color: #888;
 }
 
-.checkbox {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: #4a90d9;
+.dragging {
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
-.title {
-  flex: 1;
-  font-size: 0.9rem;
-  color: #222;
-  word-break: break-word;
-  cursor: default;
-  user-select: none;
+.selected {
+  border-color: #4a90e2;
+  background: #f0f6ff;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
+}
+
+.selectionMode .title {
+  /* Slightly muted when in selection mode to hint at select-primary interaction */
 }
 
 .editInput {
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 14px;
   padding: 2px 6px;
-  border: 1px solid #4a90d9;
+  border: 1px solid #4a90e2;
   border-radius: 4px;
   outline: none;
-  background: #f0f7ff;
-  color: #222;
 }
 
 .deleteBtn {
   flex-shrink: 0;
+  margin-right: 8px;
   background: none;
   border: none;
-  color: #bbb;
-  font-size: 0.8rem;
+  color: #aaa;
   cursor: pointer;
+  font-size: 12px;
   padding: 2px 4px;
   border-radius: 4px;
-  line-height: 1;
+  opacity: 0;
   transition:
-    color 0.15s ease,
-    background 0.15s ease;
+    opacity 0.15s,
+    color 0.15s;
+}
+
+.card:hover .deleteBtn {
+  opacity: 1;
 }
 
 .deleteBtn:hover {
@@ -74,30 +139,16 @@
   background: #fdecea;
 }
 
-.card.dragging {
-  opacity: 0.4;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 4px 0;
-  margin: -4px 0;
-}
-
+/* Drop indicators */
 .dropIndicator {
   position: absolute;
   left: 0;
   right: 0;
   height: 2px;
-  background: #4a6cf7;
+  background: #4a90e2;
   border-radius: 2px;
-  box-shadow: 0 0 6px rgba(74, 108, 247, 0.5);
   pointer-events: none;
   z-index: 10;
-  animation: fadeIn 120ms ease-out;
 }
 
 .dropIndicator.top {
@@ -108,11 +159,8 @@
   bottom: -1px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Subtle hint when Ctrl/Cmd is held — signals click will select, not complete */
+.ctrlHint {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.4);
 }

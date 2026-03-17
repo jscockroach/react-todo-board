@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFilter } from '../../hooks/useFilter';
 import styles from './SearchBar.module.css';
 
 export const SearchBar: React.FC = () => {
-  const { setSearchQuery } = useFilter();
-  const [inputValue, setInputValue] = useState('');
+  const { rawSearchQuery, setRawSearchQuery } = useFilter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setSearchQuery(e.target.value);
+    setRawSearchQuery(e.target.value);
   };
 
   const handleClear = () => {
-    setInputValue('');
-    setSearchQuery('');
+    setRawSearchQuery('');
   };
 
   return (
@@ -22,11 +19,11 @@ export const SearchBar: React.FC = () => {
         className={styles.input}
         type="text"
         placeholder="Search tasks…"
-        value={inputValue}
+        value={rawSearchQuery}
         onChange={handleChange}
         aria-label="Search tasks"
       />
-      {inputValue && (
+      {rawSearchQuery && (
         <button
           type="button"
           className={styles.clearButton}
