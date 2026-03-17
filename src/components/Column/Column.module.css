@@ -10,6 +10,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.columnHeader {
+  display: flex;
+  align-items: center;
+  flex: 2;
+}
+
 .column.dragging {
   opacity: 0.4;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
@@ -31,7 +37,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #1a1a2e;
-  margin: 0;
+  margin: 0 auto 2px 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -68,4 +74,12 @@
 .taskList.dragOver {
   background: #f0f4ff;
   outline: 2px dashed #a0aff0;
+}
+
+.selectAllCheckbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: #4a90e2;
+  flex-shrink: 0;
 }

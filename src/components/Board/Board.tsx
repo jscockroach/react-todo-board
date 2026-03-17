@@ -8,6 +8,8 @@ import { SearchBar } from '../SearchBar/SearchBar';
 import { Filter } from '../Filter/Filter';
 import { isTaskDragData } from '../TaskCard/TaskCard';
 import { isColumnDropData, isColumnDragData } from '../Column/Column';
+import { SelectionProvider } from '../../context/SelectionContext';
+import { BulkActionBar } from '../BulkActionBar/BulkActionBar';
 import styles from './Board.module.css';
 
 /** Top-level board component. Renders all columns and handles all task and column moves. */
@@ -119,25 +121,30 @@ export const Board: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div className={styles.board}>
-      <div className={styles.toolbar}>
-        <SearchBar />
-        <Filter />
+    <SelectionProvider>
+      <div className={styles.boardContainer}>
+        <BulkActionBar />
+        <div className={styles.toolbar}>
+          <SearchBar />
+          <Filter />
+        </div>
+        <div className={styles.board}>
+          <div className={styles.columns}>
+            {state.columnOrder.map((columnId) => {
+              const column = state.columns[columnId];
+              if (!column) {
+                // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
+                return null;
+              }
+              const tasks = column.taskIds
+                .map((taskId) => state.tasks[taskId])
+                .filter(Boolean);
+              return <Column key={columnId} column={column} tasks={tasks} />;
+            })}
+            <AddColumn />
+          </div>
+        </div>
       </div>
-      <div className={styles.columns}>
-        {state.columnOrder.map((columnId) => {
-          const column = state.columns[columnId];
-          if (!column) {
-            // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
-            return null;
-          }
-          const tasks = column.taskIds
-            .map((taskId) => state.tasks[taskId])
-            .filter(Boolean);
-          return <Column key={columnId} column={column} tasks={tasks} />;
-        })}
-        <AddColumn />
-      </div>
-    </div>
+    </SelectionProvider>
   );
 };

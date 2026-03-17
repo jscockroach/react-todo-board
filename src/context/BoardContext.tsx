@@ -1,5 +1,5 @@
 import { useReducer, useEffect, type ReactNode } from 'react';
-import { boardReducer } from '../store/boardReducer';
+import boardReducer from '../reducers/boardReducer';
 import { initialBoardState } from '../store/initialBoardState';
 import type { BoardState } from '../types/board';
 import { BoardContext } from './BoardContextDef';

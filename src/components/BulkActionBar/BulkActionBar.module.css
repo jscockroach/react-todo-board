@@ -1,0 +1,117 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: #4a90e2;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.35);
+  flex-wrap: wrap;
+  overflow: hidden;
+  /* animate height and opacity */
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.2s ease,
+    margin-bottom 0.25s ease,
+    padding 0.25s ease;
+  pointer-events: none;
+}
+
+.visible {
+  max-height: 80px;
+  opacity: 1;
+  padding: 10px 20px;
+  margin-bottom: 4px;
+  pointer-events: auto;
+}
+
+.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 20px;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.count {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-right: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  padding: 6px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.danger {
+  border-color: #ffaaaa;
+  color: #ffdddd;
+}
+
+.danger:hover {
+  background: rgba(255, 80, 80, 0.3);
+}
+
+.moveWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.moveLabel {
+  font-size: 0.85rem;
+}
+
+.moveSelect {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.moveSelect option {
+  color: #333;
+}
+
+.clearBtn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clearBtn:hover {
+  background: rgba(255, 255, 255, 0.4);
+}

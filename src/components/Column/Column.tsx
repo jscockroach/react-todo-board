@@ -9,6 +9,7 @@ import { TaskCard } from '../TaskCard/TaskCard';
 import { isTaskDragData } from '../TaskCard/TaskCard';
 import { AddTask } from '../AddTask/AddTask';
 import { useFilter } from '../../hooks/useFilter';
+import { useSelection } from '../../hooks/useSelection';
 
 import type { Column as ColumnType, Task } from '../../types/board';
 
@@ -49,10 +50,11 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const [isColumnDragging, setIsColumnDragging] = useState(false);
   const columnRef = useRef<HTMLDivElement>(null);
   const taskListRef = useRef<HTMLDivElement>(null);
-  const { searchQuery, statusFilter } = useFilter();
+  const { debouncedSearchQuery, statusFilter } = useFilter();
+  const { selectTasks, deselectTasks, isSelected } = useSelection();
 
   const filteredTasks = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const normalizedQuery = debouncedSearchQuery?.trim().toLowerCase() || '';
     const hasQuery = normalizedQuery.length > 0;
 
     // Fast path: no search query and no status filtering – return original array.
@@ -68,7 +70,17 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
         (statusFilter === 'active' ? !task.completed : task.completed);
       return matchesSearch && matchesStatus;
     });
-  }, [tasks, searchQuery, statusFilter]);
+  }, [tasks, debouncedSearchQuery, statusFilter]);
+
+  const allVisibleSelected =
+    filteredTasks.length > 0 && filteredTasks.every((t) => isSelected(t.id));
+  const someVisibleSelected = filteredTasks.some((t) => isSelected(t.id));
+
+  const handleSelectAll = () => {
+    const ids = filteredTasks.map((t) => t.id);
+    if (allVisibleSelected) deselectTasks(ids);
+    else selectTasks(ids);
+  };
 
   /** Make the column draggable. */
   useEffect(() => {
@@ -142,15 +154,30 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
         .join(' ')}
     >
       <div className={styles.header}>
-        <h2 className={styles.title}>{column.title}</h2>
-        <button
-          className={styles.deleteBtn}
-          onClick={handleDeleteColumn}
-          aria-label={`Delete column ${column.title}`}
-          title="Delete column"
-        >
-          ✕
-        </button>
+        <div className={styles.columnHeader}>
+          <input
+            type="checkbox"
+            checked={allVisibleSelected}
+            ref={(el) => {
+              if (el)
+                el.indeterminate = someVisibleSelected && !allVisibleSelected;
+            }}
+            onChange={handleSelectAll}
+            className={styles.selectAllCheckbox}
+            aria-label={`Select all tasks in "${column.title}"`}
+            title="Select all tasks in this column"
+            disabled={filteredTasks.length === 0}
+          />
+          <h2 className={styles.title}>{column.title}</h2>
+          <button
+            className={styles.deleteBtn}
+            onClick={handleDeleteColumn}
+            aria-label={`Delete column ${column.title}`}
+            title="Delete column"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div

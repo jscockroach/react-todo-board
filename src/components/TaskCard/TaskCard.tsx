@@ -11,6 +11,7 @@ import {
 import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/types';
 import type { Task } from '../../types/board';
 import { useBoardState } from '../../hooks/useBoardState';
+import { useSelection } from '../../hooks/useSelection';
 import styles from './TaskCard.module.css';
 
 interface TaskCardProps {
@@ -33,12 +34,35 @@ export const isTaskDragData = (
 /** Renders a single task card with inline editing, completion toggle, delete, and drag support. */
 export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const { dispatch } = useBoardState();
+  const { toggleTaskSelection, isSelected, selectedTaskIds } = useSelection();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const selected = isSelected(task.id);
+  const selectionMode = selectedTaskIds.size > 0;
+  const checkboxVisible = selectionMode || (isHovered && isCtrlPressed);
+
+  // Track Ctrl/Cmd globally so it works even without mouse movement
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) =>
+      setIsCtrlPressed(e.ctrlKey || e.metaKey);
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('keyup', handleKey);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('keyup', handleKey);
+    };
+  }, []);
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -85,10 +109,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     };
   }, [task.id, columnId]);
 
-  const handleToggle = () =>
-    dispatch({ type: 'TOGGLE_TASK', payload: { taskId: task.id } });
-  const handleDelete = () =>
+  const handleDelete = () => {
     dispatch({ type: 'DELETE_TASK', payload: { taskId: task.id } });
+  };
 
   const handleEditSubmit = () => {
     const trimmed = editValue.trim();
@@ -101,6 +124,48 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       setEditValue(task.title);
     }
     setIsEditing(false);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // If clicked on title, editInput, button or checkbox — don't handle here
+    if (
+      target.closest('input') ||
+      target.closest('button') ||
+      target.closest(`.${styles.title}`) ||
+      isEditing
+    )
+      return;
+
+    // Click on card background/padding → toggle selection
+    toggleTaskSelection(task.id);
+  };
+
+  const handleTitleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isEditing) return;
+
+    if (e.ctrlKey || e.metaKey) {
+      toggleTaskSelection(task.id);
+      return;
+    }
+
+    // Delay single-click action to wait and see if dblclick follows
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => {
+      clickTimerRef.current = null;
+      dispatch({ type: 'TOGGLE_TASK', payload: { taskId: task.id } });
+    }, 220);
+  };
+
+  const handleTitleDoubleClick = () => {
+    // Cancel pending single-click toggle
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    setEditValue(task.title);
+    setIsEditing(true);
   };
 
   return (
@@ -119,17 +184,36 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
           styles.card,
           task.completed ? styles.completed : '',
           isDragging ? styles.dragging : '',
+          selected ? styles.selected : '',
+          selectionMode ? styles.selectionMode : '',
+          isHovered && isCtrlPressed && !selectionMode ? styles.ctrlHint : '',
         ]
           .filter(Boolean)
           .join(' ')}
+        onClick={handleCardClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={handleToggle}
-          className={styles.checkbox}
-          aria-label={`Mark "${task.title}" as ${task.completed ? 'incomplete' : 'complete'}`}
-        />
+        {/* Fixed-width checkbox container — always reserves space, visibility via opacity */}
+        <div
+          className={[
+            styles.checkboxContainer,
+            checkboxVisible ? styles.checkboxVisible : '',
+          ].join(' ')}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* prevent card click when clicking container */}
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => toggleTaskSelection(task.id)}
+            className={styles.selectionCheckbox}
+            aria-label={`Select task "${task.title}"`}
+            title={
+              selectionMode ? 'Deselect task' : 'Select task (or Ctrl+click)'
+            }
+          />
+        </div>
 
         {isEditing ? (
           <input
@@ -150,20 +234,19 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
         ) : (
           <span
             className={styles.title}
-            onDoubleClick={() => {
-              if (task.completed) return;
-              setEditValue(task.title);
-              setIsEditing(true);
-            }}
-            title={task.completed ? undefined : 'Double-click to edit'}
-            role={task.completed ? undefined : 'button'}
-            tabIndex={task.completed ? -1 : 0}
+            onClick={handleTitleClick}
+            onDoubleClick={handleTitleDoubleClick}
+            title={
+              task.completed
+                ? 'Click to mark active · Double-click to edit'
+                : 'Click to complete · Double-click to edit'
+            }
+            role="button"
+            tabIndex={0}
             onKeyDown={(e) => {
-              if (task.completed) return;
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setEditValue(task.title);
-                setIsEditing(true);
+                dispatch({ type: 'TOGGLE_TASK', payload: { taskId: task.id } });
               }
             }}
           >
@@ -173,7 +256,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
 
         <button
           className={styles.deleteBtn}
-          onClick={handleDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
           aria-label={`Delete task "${task.title}"`}
           title="Delete task"
         >
