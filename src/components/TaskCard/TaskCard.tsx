@@ -313,6 +313,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                 : 'Click to complete · Double-click to edit'
             }
             role="button"
+            aria-pressed={task.completed}
+            aria-label={
+              task.completed
+                ? `Mark task "${task.title}" as active`
+                : `Mark task "${task.title}" as completed`
+            }
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
