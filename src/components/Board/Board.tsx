@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { useBoardState } from '../../hooks/useBoardState';
@@ -11,6 +11,13 @@ import styles from './Board.module.css';
 /** Top-level board component. Renders all columns and handles all task and column moves. */
 export const Board: React.FC = () => {
   const { state, dispatch } = useBoardState();
+  const stateRef = useRef(state);
+
+  // Keep a ref to the latest board state so the drop handler always sees
+  // up-to-date data without re-registering the monitor on each change.
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     return monitorForElements({
@@ -20,6 +27,7 @@ export const Board: React.FC = () => {
 
         const sourceData = source.data as Record<string, unknown>;
         const innerData = targets[0].data as Record<string, unknown>;
+        const currentState = stateRef.current;
 
         // --- Column move ---
         if (isColumnDragData(sourceData) && isColumnDragData(innerData)) {
@@ -27,8 +35,8 @@ export const Board: React.FC = () => {
           const targetColumnId = innerData.columnId as string;
           if (sourceColumnId === targetColumnId) return;
 
-          const sourceIndex = state.columnOrder.indexOf(sourceColumnId);
-          const destIndex = state.columnOrder.indexOf(targetColumnId);
+          const sourceIndex = currentState.columnOrder.indexOf(sourceColumnId);
+          const destIndex = currentState.columnOrder.indexOf(targetColumnId);
           if (sourceIndex === -1 || destIndex === -1) return;
 
           dispatch({
@@ -43,7 +51,7 @@ export const Board: React.FC = () => {
 
         const sourceTaskId = sourceData.taskId as string;
         const sourceColumnId = sourceData.columnId as string;
-        const sourceColumn = state.columns[sourceColumnId];
+        const sourceColumn = currentState.columns[sourceColumnId];
         if (!sourceColumn) return;
 
         const sourceIndex = sourceColumn.taskIds.indexOf(sourceTaskId);
@@ -52,7 +60,7 @@ export const Board: React.FC = () => {
         if (isTaskDragData(innerData)) {
           const targetTaskId = innerData.taskId as string;
           const targetColumnId = innerData.columnId as string;
-          const destColumn = state.columns[targetColumnId];
+          const destColumn = currentState.columns[targetColumnId];
           if (!destColumn) return;
 
           let destIndex = destColumn.taskIds.indexOf(targetTaskId);
@@ -84,7 +92,7 @@ export const Board: React.FC = () => {
           const targetColumnId = innerData.columnId as string;
           if (sourceColumnId === targetColumnId) return;
 
-          const destColumn = state.columns[targetColumnId];
+          const destColumn = currentState.columns[targetColumnId];
           if (!destColumn) return;
 
           dispatch({
@@ -99,7 +107,7 @@ export const Board: React.FC = () => {
         }
       },
     });
-  }, [state.columns, state.columnOrder, dispatch]);
+  }, [dispatch]);
 
   return (
     <div className={styles.board}>
