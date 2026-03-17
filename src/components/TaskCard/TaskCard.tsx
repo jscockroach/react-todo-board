@@ -230,6 +230,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     setIsEditing(true);
   };
 
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div ref={wrapperRef} className={styles.wrapper}>
       {closestEdge && (
