@@ -48,19 +48,24 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const taskListRef = useRef<HTMLDivElement>(null);
   const { searchQuery, statusFilter } = useFilter();
 
-  const filteredTasks = useMemo(
-    () =>
-      tasks.filter((task) => {
-        const matchesSearch = task.title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const matchesStatus =
-          statusFilter === 'all' ||
-          (statusFilter === 'active' ? !task.completed : task.completed);
-        return matchesSearch && matchesStatus;
-      }),
-    [tasks, searchQuery, statusFilter],
-  );
+  const filteredTasks = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const hasQuery = normalizedQuery.length > 0;
+
+    // Fast path: no search query and no status filtering – return original array.
+    if (!hasQuery && statusFilter === 'all') {
+      return tasks;
+    }
+
+    return tasks.filter((task) => {
+      const matchesSearch =
+        !hasQuery || task.title.toLowerCase().includes(normalizedQuery);
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' ? !task.completed : task.completed);
+      return matchesSearch && matchesStatus;
+    });
+  }, [tasks, searchQuery, statusFilter]);
 
   /** Make the column draggable. */
   useEffect(() => {
