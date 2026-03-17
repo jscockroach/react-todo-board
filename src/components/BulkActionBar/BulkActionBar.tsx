@@ -69,11 +69,13 @@ export const BulkActionBar: React.FC = () => {
             <option value="" disabled>
               Column…
             </option>
-            {state.columnOrder.map((colId) => (
-              <option key={colId} value={colId}>
-                {state.columns[colId].title}
-              </option>
-            ))}
+            {state.columnOrder
+              .filter((colId) => state.columns[colId])
+              .map((colId) => (
+                <option key={colId} value={colId}>
+                  {state.columns[colId].title}
+                </option>
+              ))}
           </select>
         </div>
 
