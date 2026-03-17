@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   draggable,
   dropTargetForElements,
-  monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import {
   attachClosestEdge,
@@ -66,19 +65,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       canDrop: ({ source }) =>
         isTaskDragData(source.data as Record<string, unknown>) &&
         source.data.taskId !== task.id,
+      onDragEnter({ self }) {
+        setClosestEdge(extractClosestEdge(self.data));
+      },
       onDrag({ self }) {
         setClosestEdge(extractClosestEdge(self.data));
       },
-      onDrop: () => setClosestEdge(null),
-    });
-
-    /** Clear indicator when the drag moves away from this card entirely. */
-    const cleanupMonitor = monitorForElements({
-      onDrag({ location }) {
-        const isOver = location.current.dropTargets.some(
-          (t) => t.element === el,
-        );
-        if (!isOver) setClosestEdge(null);
+      onDragLeave() {
+        setClosestEdge(null);
       },
       onDrop() {
         setClosestEdge(null);
@@ -88,7 +82,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     return () => {
       cleanupDraggable();
       cleanupDropTarget();
-      cleanupMonitor();
     };
   }, [task.id, columnId]);
 
@@ -152,12 +145,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
                 setIsEditing(false);
               }
             }}
+            aria-label={`Edit title for task "${task.title}"`}
           />
         ) : (
           <span
             className={styles.title}
             onDoubleClick={() => !task.completed && setIsEditing(true)}
             title={task.completed ? undefined : 'Double-click to edit'}
+            role={task.completed ? undefined : 'button'}
+            tabIndex={task.completed ? -1 : 0}
+            onKeyDown={(e) => {
+              if (task.completed) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsEditing(true);
+              }
+            }}
           >
             {task.title}
           </span>
