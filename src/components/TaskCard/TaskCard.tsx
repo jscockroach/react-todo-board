@@ -150,7 +150,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
         ) : (
           <span
             className={styles.title}
-            onDoubleClick={() => !task.completed && setIsEditing(true)}
+            onDoubleClick={() => {
+              if (task.completed) return;
+              setEditValue(task.title);
+              setIsEditing(true);
+            }}
             title={task.completed ? undefined : 'Double-click to edit'}
             role={task.completed ? undefined : 'button'}
             tabIndex={task.completed ? -1 : 0}
@@ -158,6 +162,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
               if (task.completed) return;
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                setEditValue(task.title);
                 setIsEditing(true);
               }
             }}
