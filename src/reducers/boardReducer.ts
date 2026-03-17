@@ -182,6 +182,14 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
       const targetCol = state.columns[toColumnId];
       if (!targetCol) return state;
 
+      // If all selected tasks are already in the target column,
+      // avoid removing and re-appending them to prevent reordering.
+      const targetTaskIds = new Set(targetCol.taskIds);
+      const allInTarget = taskIds.every((id) => targetTaskIds.has(id));
+      if (allInTarget) {
+        return state;
+      }
+
       const newColumns = Object.fromEntries(
         Object.entries(state.columns).map(([colId, col]) => [
           colId,
