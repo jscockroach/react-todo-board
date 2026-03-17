@@ -7,16 +7,17 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [rawQuery, setRawQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  const searchQuery = useDebounce(rawQuery, 300);
+  const debouncedSearchQuery = useDebounce(rawQuery, 300);
 
   const value = useMemo(
     () => ({
-      searchQuery,
-      setSearchQuery: setRawQuery,
+      rawSearchQuery: rawQuery,
+      debouncedSearchQuery,
+      setRawSearchQuery: setRawQuery,
       statusFilter,
       setStatusFilter,
     }),
-    [searchQuery, statusFilter],
+    [rawQuery, debouncedSearchQuery, statusFilter],
   );
 
   return (
