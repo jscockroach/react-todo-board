@@ -4,14 +4,16 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
   switch (action.type) {
     case 'ADD_TASK': {
       const { columnId, task } = action.payload;
+      const column = state.columns[columnId];
+      if (!column) return state;
       return {
         ...state,
         tasks: { ...state.tasks, [task.id]: task },
         columns: {
           ...state.columns,
           [columnId]: {
-            ...state.columns[columnId],
-            taskIds: [...state.columns[columnId].taskIds, task.id],
+            ...column,
+            taskIds: [...column.taskIds, task.id],
           },
         },
       };
