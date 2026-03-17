@@ -28,6 +28,10 @@ export const BulkActionBar: React.FC = () => {
     clearSelection();
   };
 
+  if (!visible) {
+    return null;
+  }
+
   return (
     <div
       className={[styles.bar, visible ? styles.visible : styles.hidden].join(
