@@ -21,6 +21,7 @@ export const Filter: React.FC = () => {
       {OPTIONS.map(({ label, value }) => (
         <button
           key={value}
+          type="button"
           className={`${styles.button} ${statusFilter === value ? styles.active : ''}`}
           onClick={() => setStatusFilter(value)}
           aria-pressed={statusFilter === value}
