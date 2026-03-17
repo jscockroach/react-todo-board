@@ -37,7 +37,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #1a1a2e;
-  margin: 0 auto 2px 4px;
+  margin: 0 auto 1px 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -65,7 +65,7 @@
   flex-direction: column;
   gap: 8px;
   flex: 1;
-  min-height: 40px;
+  min-height: 20px;
   border-radius: 6px;
   transition: background 0.15s;
   padding: 2px 0;
