@@ -186,7 +186,7 @@
   line-height: 1.4;
 }
 
-/**
+/*
  * Highlighted text segment — wraps the portion of a task title that matches
  * the current search query.  Uses a warm yellow background so it stands out
  * against both normal and completed-task backgrounds without obscuring the
