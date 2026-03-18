@@ -6,6 +6,7 @@ import { isColumnDropData, isColumnDragData } from '../Column/Column';
 import { moveMultipleTasks } from './moveMultipleTasks';
 import type { BoardState } from '../../types/board';
 import type { BoardAction } from '../../types/board';
+import type { Dispatch } from 'react';
 
 /**
  * Registers a global drag-and-drop monitor for the board.
@@ -19,7 +20,7 @@ import type { BoardAction } from '../../types/board';
  */
 export function useBoardDragMonitor(
   state: BoardState,
-  dispatch: React.Dispatch<BoardAction>,
+  dispatch: Dispatch<BoardAction>,
 ) {
   // Always-fresh ref so the onDrop closure reads current state
   // without having it as an effect dependency.
