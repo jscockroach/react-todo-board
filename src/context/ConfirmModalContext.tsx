@@ -14,7 +14,13 @@ export const ConfirmModalProvider: React.FC<{ children: React.ReactNode }> = ({
   const confirm = useCallback(
     ({ message }: ConfirmOptions): Promise<boolean> => {
       return new Promise((resolve) => {
-        setState({ message, resolve });
+        setState((prev) => {
+          // If there is an existing pending confirmation, resolve it as cancelled
+          if (prev) {
+            prev.resolve(false);
+          }
+          return { message, resolve };
+        });
       });
     },
     [],
