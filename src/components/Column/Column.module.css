@@ -89,5 +89,6 @@
     min-width: unset;
     max-width: unset;
     width: 100%;
+    box-sizing: border-box;
   }
 }

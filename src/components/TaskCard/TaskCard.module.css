@@ -46,7 +46,7 @@
 
 /* Faintly visible on any card hover — helps discoverability */
 .card:hover .checkboxContainer {
-  width: 24px;
+  width: 30px;
   opacity: 0.25;
   pointer-events: auto;
 }
@@ -83,6 +83,7 @@
 /* Completed state */
 .completed {
   opacity: 0.55;
+  background: #ededed;
 }
 
 .completed .title {
@@ -116,7 +117,6 @@
 
 .deleteBtn {
   flex-shrink: 0;
-  margin-right: 8px;
   background: none;
   border: none;
   color: #aaa;
