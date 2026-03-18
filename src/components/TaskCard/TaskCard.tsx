@@ -13,6 +13,8 @@ import {
 import { useBoardState } from '../../hooks/useBoardState';
 import { useSelection } from '../../hooks/useSelection';
 import { useConfirm } from '../../hooks/useConfirm';
+import { useFilter } from '../../hooks/useFilter';
+import { highlightText } from '../../utils/highlightText';
 
 import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/types';
 import type { Task } from '../../types/board';
@@ -115,6 +117,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const { dispatch } = useBoardState();
   const { toggleTaskSelection, isSelected, selectedTaskIds } = useSelection();
   const { confirm } = useConfirm();
+  // Read the live search query so we can highlight matches in the title.
+  const { rawSearchQuery } = useFilter();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [isDragging, setIsDragging] = useState(false);
@@ -368,7 +372,23 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
               }
             }}
           >
-            {task.title}
+            {/*
+             * Render the title split into highlighted / un-highlighted segments.
+             * highlightText() returns [{text, highlight}, …] — matched segments
+             * are wrapped in <mark> so they receive accent styling; unmatched
+             * segments are rendered as plain text nodes.
+             * When there is no active search query the function returns a single
+             * un-highlighted segment, keeping the output identical to before.
+             */}
+            {highlightText(task.title, rawSearchQuery).map((segment, index) =>
+              segment.highlight ? (
+                <mark key={index} className={styles.highlight}>
+                  {segment.text}
+                </mark>
+              ) : (
+                <React.Fragment key={index}>{segment.text}</React.Fragment>
+              ),
+            )}
           </span>
         )}
 
