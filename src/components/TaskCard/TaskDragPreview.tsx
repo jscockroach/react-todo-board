@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import type { FC } from 'react';
 import styles from './TaskCard.module.css';
 
 interface TaskDragPreviewProps {
@@ -19,7 +20,7 @@ interface TaskDragPreviewProps {
  * Portals into `container` which is sized to match the original card
  * (see `useTaskDrag` → `render`), so the preview looks identical to the card.
  */
-export const TaskDragPreview: React.FC<TaskDragPreviewProps> = ({
+export const TaskDragPreview: FC<TaskDragPreviewProps> = ({
   container,
   title,
   count = 1,
