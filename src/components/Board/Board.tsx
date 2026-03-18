@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useBoardState } from '../../hooks/useBoardState';
 import { Column } from '../Column/Column';
 import { AddColumn } from '../AddColumn/AddColumn';
@@ -9,7 +9,6 @@ import { BulkActionBar } from '../BulkActionBar/BulkActionBar';
 import { ConfirmModalProvider } from '../../context/ConfirmModalContext';
 import { useDragScroll } from '../../hooks/useDragScroll';
 import { useBoardDragMonitor } from './useBoardDragMonitor';
-import { useRef } from 'react';
 import styles from './Board.module.css';
 
 export const Board: React.FC = () => {
