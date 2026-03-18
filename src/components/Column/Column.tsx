@@ -10,6 +10,7 @@ import { isTaskDragData } from '../TaskCard/TaskCard';
 import { AddTask } from '../AddTask/AddTask';
 import { useFilter } from '../../hooks/useFilter';
 import { useSelection } from '../../hooks/useSelection';
+import { useConfirm } from '../../hooks/useConfirm';
 
 import type { Column as ColumnType, Task } from '../../types/board';
 
@@ -45,6 +46,7 @@ export const isColumnDragData = (
 /** Renders a single Kanban column with its tasks, drop zone, drag support, and controls. */
 export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const { dispatch } = useBoardState();
+  const { confirm } = useConfirm();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isColumnDragOver, setIsColumnDragOver] = useState(false);
   const [isColumnDragging, setIsColumnDragging] = useState(false);
@@ -138,7 +140,11 @@ export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
     });
   }, [column.id]);
 
-  const handleDeleteColumn = () => {
+  const handleDeleteColumn = async () => {
+    const ok = await confirm({
+      message: `Delete column "${column.title}" and all its tasks? This cannot be undone.`,
+    });
+    if (!ok) return;
     dispatch({ type: 'DELETE_COLUMN', payload: { columnId: column.id } });
   };
 

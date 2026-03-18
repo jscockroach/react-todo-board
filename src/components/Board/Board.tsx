@@ -10,12 +10,17 @@ import { isTaskDragData } from '../TaskCard/TaskCard';
 import { isColumnDropData, isColumnDragData } from '../Column/Column';
 import { SelectionProvider } from '../../context/SelectionContext';
 import { BulkActionBar } from '../BulkActionBar/BulkActionBar';
+import { ConfirmModalProvider } from '../../context/ConfirmModalContext';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import styles from './Board.module.css';
 
 /** Top-level board component. Renders all columns and handles all task and column moves. */
 export const Board: React.FC = () => {
   const { state, dispatch } = useBoardState();
   const stateRef = useRef(state);
+  const columnsWrapperRef = useRef<HTMLDivElement>(null);
+
+  useDragScroll(columnsWrapperRef);
 
   // Keep a ref to the latest board state so the drop handler always sees
   // up-to-date data without re-registering the monitor on each change.
@@ -40,15 +45,8 @@ export const Board: React.FC = () => {
           if (sourceColumnId === targetColumnId) return;
 
           const sourceIndex = currentState.columnOrder.indexOf(sourceColumnId);
-          let destIndex = currentState.columnOrder.indexOf(targetColumnId);
+          const destIndex = currentState.columnOrder.indexOf(targetColumnId);
           if (sourceIndex === -1 || destIndex === -1) return;
-
-          // When reordering within the same array, removing the source first
-          // shifts indices down. If moving forward, adjust destIndex so that
-          // dropping "on" a column yields consistent placement semantics.
-          if (sourceIndex < destIndex) {
-            destIndex -= 1;
-          }
 
           dispatch({
             type: 'MOVE_COLUMN',
@@ -121,30 +119,32 @@ export const Board: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <SelectionProvider>
-      <div className={styles.board}>
-        <BulkActionBar />
-        <div className={styles.toolbar}>
-          <SearchBar />
-          <Filter />
-        </div>
+    <ConfirmModalProvider>
+      <SelectionProvider>
         <div className={styles.board}>
-          <div className={styles.columns}>
-            {state.columnOrder.map((columnId) => {
-              const column = state.columns[columnId];
-              if (!column) {
-                // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
-                return null;
-              }
-              const tasks = column.taskIds
-                .map((taskId) => state.tasks[taskId])
-                .filter(Boolean);
-              return <Column key={columnId} column={column} tasks={tasks} />;
-            })}
-            <AddColumn />
+          <BulkActionBar />
+          <div className={styles.toolbar}>
+            <SearchBar />
+            <Filter />
+          </div>
+          <div className={styles.columnsWrapper} ref={columnsWrapperRef}>
+            <div className={styles.columns}>
+              {state.columnOrder.map((columnId) => {
+                const column = state.columns[columnId];
+                if (!column) {
+                  // Skip rendering if the column is missing from state (e.g. corrupted persisted state)
+                  return null;
+                }
+                const tasks = column.taskIds
+                  .map((taskId) => state.tasks[taskId])
+                  .filter(Boolean);
+                return <Column key={columnId} column={column} tasks={tasks} />;
+              })}
+              <AddColumn />
+            </div>
           </div>
         </div>
-      </div>
-    </SelectionProvider>
+      </SelectionProvider>
+    </ConfirmModalProvider>
   );
 };

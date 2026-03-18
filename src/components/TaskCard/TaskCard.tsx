@@ -1,17 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   draggable,
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import {
   attachClosestEdge,
   extractClosestEdge,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/types';
-import type { Task } from '../../types/board';
 import { useBoardState } from '../../hooks/useBoardState';
 import { useSelection } from '../../hooks/useSelection';
+import { useConfirm } from '../../hooks/useConfirm';
+
+import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/types';
+import type { Task } from '../../types/board';
+
 import styles from './TaskCard.module.css';
 
 interface TaskCardProps {
@@ -109,11 +114,14 @@ const useGlobalCtrlMetaPressed = (): boolean => {
 export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const { dispatch } = useBoardState();
   const { toggleTaskSelection, isSelected, selectedTaskIds } = useSelection();
+  const { confirm } = useConfirm();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [dragPreviewContainer, setDragPreviewContainer] =
+    useState<HTMLElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -137,7 +145,29 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       element: dragEl,
       getInitialData: () => dragData as Record<string, unknown>,
       onDragStart: () => setIsDragging(true),
-      onDrop: () => setIsDragging(false),
+      onDrop: () => {
+        setIsDragging(false);
+        setDragPreviewContainer(null);
+      },
+      onGenerateDragPreview({ nativeSetDragImage, source, location }) {
+        const rect = source.element.getBoundingClientRect();
+        const mouseX = location.initial.input.clientX;
+        const mouseY = location.initial.input.clientY;
+        const offsetX = mouseX - rect.left;
+        const offsetY = mouseY - rect.top;
+
+        setCustomNativeDragPreview({
+          nativeSetDragImage,
+          getOffset() {
+            return { x: offsetX, y: offsetY };
+          },
+          render({ container }) {
+            container.style.width = `${rect.width}px`;
+            container.style.height = `${rect.height}px`;
+            setDragPreviewContainer(container);
+          },
+        });
+      },
     });
 
     const cleanupDropTarget = dropTargetForElements({
@@ -171,7 +201,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
     };
   }, [task.id, columnId]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    const ok = await confirm({
+      message: `Delete task "${task.title}"?`,
+    });
+    if (!ok) return;
     dispatch({ type: 'DELETE_TASK', payload: { taskId: task.id } });
   };
 
@@ -350,6 +384,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
           ✕
         </button>
       </div>
+
+      {dragPreviewContainer &&
+        createPortal(
+          <div className={styles.dragPreview}>{task.title}</div>,
+          dragPreviewContainer,
+        )}
     </div>
   );
 };

@@ -46,7 +46,7 @@
 
 /* Faintly visible on any card hover — helps discoverability */
 .card:hover .checkboxContainer {
-  width: 24px;
+  width: 30px;
   opacity: 0.25;
   pointer-events: auto;
 }
@@ -83,6 +83,7 @@
 /* Completed state */
 .completed {
   opacity: 0.55;
+  background: #ededed;
 }
 
 .completed .title {
@@ -92,7 +93,7 @@
 
 .dragging {
   opacity: 1;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 16px rgba(65, 133, 202, 0.8);
 }
 
 .selected {
@@ -116,7 +117,6 @@
 
 .deleteBtn {
   flex-shrink: 0;
-  margin-right: 8px;
   background: none;
   border: none;
   color: #aaa;
@@ -163,4 +163,25 @@
 .ctrlHint {
   border-color: #4a90e2;
   box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.4);
+}
+
+.dragPreview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 10px 10px 8px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #4a90e2;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.45);
+  font-size: 14px;
+  color: #333;
+  white-space: normal;
+  word-break: break-word;
+  overflow: hidden;
+  opacity: 0.95;
+  line-height: 1.4;
 }
