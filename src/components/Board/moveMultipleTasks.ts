@@ -1,5 +1,6 @@
 import type { BoardState } from '../../types/board';
 import type { BoardAction } from '../../types/board';
+import type { Dispatch } from 'react';
 
 interface MoveMultipleTasksOptions {
   /** IDs of all tasks being dragged (1 for single drag, N for multi-select drag). */
@@ -13,7 +14,7 @@ interface MoveMultipleTasksOptions {
   destIndex: number;
   /** Snapshot of board state at the moment of the drop. */
   currentState: BoardState;
-  dispatch: React.Dispatch<BoardAction>;
+  dispatch: Dispatch<BoardAction>;
 }
 
 /**
