@@ -43,29 +43,54 @@ export function moveMultipleTasks({
   }
   if (!virtual[targetColumnId]) return;
 
+  // ── Build task position lookup ──────────────────────────────────────────
+  // Maps each taskId to its current column and index within that column.
+  const positionByTaskId: Record<string, { columnId: string; index: number }> =
+    {};
+  for (const [columnId, taskIds] of Object.entries(virtual)) {
+    taskIds.forEach((taskId, index) => {
+      positionByTaskId[taskId] = { columnId, index };
+    });
+  }
+
   // ── Sort tasks by current position ──────────────────────────────────────
   // Preserves relative visual order when tasks land at the destination.
   // Tasks from different columns are kept in draggedTaskIds order (stable).
   const ordered = [...draggedTaskIds].sort((a, b) => {
-    const colA = Object.keys(virtual).find((c) => virtual[c].includes(a));
-    const colB = Object.keys(virtual).find((c) => virtual[c].includes(b));
-    if (!colA || !colB || colA !== colB) return 0;
-    return virtual[colA].indexOf(a) - virtual[colB].indexOf(b);
+    const posA = positionByTaskId[a];
+    const posB = positionByTaskId[b];
+
+    if (!posA || !posB || posA.columnId !== posB.columnId) {
+      // Different columns (or missing data): keep original order.
+      return 0;
+    }
+
+    return posA.index - posB.index;
   });
 
   // Clamp so we never insert beyond the current length
   let insertAt = Math.min(destIndex, virtual[targetColumnId].length);
 
+  // Helper to recompute positions for all tasks in a single column
+  const updatePositions = (columnId: string): void => {
+    const taskIds = virtual[columnId];
+    if (!taskIds) return;
+    for (let i = 0; i < taskIds.length; i += 1) {
+      const id = taskIds[i];
+      positionByTaskId[id] = { columnId, index: i };
+    }
+  };
+
   // ── Process each task ───────────────────────────────────────────────────
   for (const taskId of ordered) {
-    // Find which column currently holds this task (in virtual state)
-    const taskSourceColId = Object.keys(virtual).find((c) =>
-      virtual[c].includes(taskId),
-    );
-    if (!taskSourceColId) continue;
+    const pos = positionByTaskId[taskId];
+    if (!pos) continue;
 
-    const srcIdx = virtual[taskSourceColId].indexOf(taskId);
-    if (srcIdx === -1) continue;
+    const taskSourceColId = pos.columnId;
+    const srcIdx = pos.index;
+
+    if (!virtual[taskSourceColId]) continue;
+    if (srcIdx < 0 || srcIdx >= virtual[taskSourceColId].length) continue;
 
     // When the task is removed from the same column before the insert point,
     // the insert index shifts down by one.
@@ -85,6 +110,10 @@ export function moveMultipleTasks({
     // the next iteration reads the correct indices.
     virtual[taskSourceColId].splice(srcIdx, 1);
     virtual[targetColumnId].splice(adjustedInsert, 0, taskId);
+
+    // Keep the task position lookup in sync with the virtual state.
+    updatePositions(taskSourceColId);
+    updatePositions(targetColumnId);
 
     dispatch({
       type: 'MOVE_TASK',
