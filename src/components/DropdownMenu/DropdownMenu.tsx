@@ -21,8 +21,20 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   position,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Remember the element that was focused before the menu opened.
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    // Move focus into the menu (prefer the first menu item).
+    if (menuRef.current) {
+      const firstItem =
+        menuRef.current.querySelector<HTMLElement>('button[role="menuitem"]') ??
+        menuRef.current;
+      firstItem.focus();
+    }
+
     const handlePointerDown = (e: PointerEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         onClose();
@@ -36,6 +48,11 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     return () => {
       window.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('keydown', handleKeyDown);
+
+      // Restore focus to the previously focused element (typically the trigger).
+      if (previouslyFocusedElementRef.current) {
+        previouslyFocusedElementRef.current.focus();
+      }
     };
   }, [onClose]);
 
@@ -43,6 +60,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     <div
       className={styles.menu}
       ref={menuRef}
+      role="menu"
+      aria-orientation="vertical"
       style={{
         top: position.top,
         right: position.right,
@@ -56,6 +75,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
           className={[styles.item, item.danger ? styles.danger : '']
             .filter(Boolean)
             .join(' ')}
+          role="menuitem"
+          tabIndex={-1}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={() => {
             item.onClick();
