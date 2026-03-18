@@ -21,6 +21,12 @@ export interface TaskDragData {
   type: 'task';
   taskId: string;
   columnId: string;
+  /**
+   * All task IDs being moved in this drag operation.
+   * Contains multiple IDs when the dragged card is part of a multi-selection,
+   * otherwise contains only the single dragged task's ID.
+   */
+  draggedTaskIds: string[];
   [key: string]: unknown;
 }
 
@@ -38,16 +44,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
 
+  const selected = isSelected(task.id);
+  const selectionMode = selectedTaskIds.size > 0;
+
   const {
     wrapperRef,
     dragHandleRef,
     isDragging,
     closestEdge,
     dragPreviewContainer,
-  } = useTaskDrag({ taskId: task.id, columnId });
-
-  const selected = isSelected(task.id);
-  const selectionMode = selectedTaskIds.size > 0;
+  } = useTaskDrag({ taskId: task.id, columnId, selected, selectedTaskIds });
 
   const handleDelete = async () => {
     const ok = await confirm({ message: `Delete task "${task.title}"?` });
@@ -138,7 +144,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
       </div>
 
       {dragPreviewContainer && (
-        <TaskDragPreview container={dragPreviewContainer} title={task.title} />
+        /**
+         * count: when this card is selected, pass the full selection size so
+         * the preview shows "N tasks"; otherwise 1 (single-card drag).
+         */
+        <TaskDragPreview
+          container={dragPreviewContainer}
+          title={task.title}
+          count={selected ? selectedTaskIds.size : 1}
+        />
       )}
     </div>
   );

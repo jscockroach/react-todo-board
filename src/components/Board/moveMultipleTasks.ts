@@ -1,0 +1,102 @@
+import type { BoardState } from '../../types/board';
+import type { BoardAction } from '../../types/board';
+
+interface MoveMultipleTasksOptions {
+  /** IDs of all tasks being dragged (1 for single drag, N for multi-select drag). */
+  draggedTaskIds: string[];
+  /** Column the tasks are being dropped into. */
+  targetColumnId: string;
+  /**
+   * Index in the target column where the first task should land.
+   * Subsequent tasks are inserted directly after it.
+   */
+  destIndex: number;
+  /** Snapshot of board state at the moment of the drop. */
+  currentState: BoardState;
+  dispatch: React.Dispatch<BoardAction>;
+}
+
+/**
+ * Moves one or more tasks to `targetColumnId` starting at `destIndex`.
+ *
+ * Because the reducer applies each MOVE_TASK action sequentially, we
+ * maintain a **virtual** (in-memory) copy of every column's task list.
+ * After each simulated move we read indices from the virtual state so
+ * that subsequent dispatches always reference correct positions — even
+ * when multiple tasks come from the same column.
+ *
+ * Tasks are inserted in their original relative order (sorted by their
+ * current position before any moves begin).
+ */
+export function moveMultipleTasks({
+  draggedTaskIds,
+  targetColumnId,
+  destIndex,
+  currentState,
+  dispatch,
+}: MoveMultipleTasksOptions): void {
+  // ── Build virtual snapshot ──────────────────────────────────────────────
+  // This mirrors the reducer state after each successive dispatch.
+  const virtual: Record<string, string[]> = {};
+  for (const colId of Object.keys(currentState.columns)) {
+    virtual[colId] = [...currentState.columns[colId].taskIds];
+  }
+  if (!virtual[targetColumnId]) return;
+
+  // ── Sort tasks by current position ──────────────────────────────────────
+  // Preserves relative visual order when tasks land at the destination.
+  // Tasks from different columns are kept in draggedTaskIds order (stable).
+  const ordered = [...draggedTaskIds].sort((a, b) => {
+    const colA = Object.keys(virtual).find((c) => virtual[c].includes(a));
+    const colB = Object.keys(virtual).find((c) => virtual[c].includes(b));
+    if (!colA || !colB || colA !== colB) return 0;
+    return virtual[colA].indexOf(a) - virtual[colB].indexOf(b);
+  });
+
+  // Clamp so we never insert beyond the current length
+  let insertAt = Math.min(destIndex, virtual[targetColumnId].length);
+
+  // ── Process each task ───────────────────────────────────────────────────
+  for (const taskId of ordered) {
+    // Find which column currently holds this task (in virtual state)
+    const taskSourceColId = Object.keys(virtual).find((c) =>
+      virtual[c].includes(taskId),
+    );
+    if (!taskSourceColId) continue;
+
+    const srcIdx = virtual[taskSourceColId].indexOf(taskId);
+    if (srcIdx === -1) continue;
+
+    // When the task is removed from the same column before the insert point,
+    // the insert index shifts down by one.
+    let adjustedInsert = insertAt;
+    if (taskSourceColId === targetColumnId && srcIdx < adjustedInsert) {
+      adjustedInsert -= 1;
+    }
+
+    // Skip no-op: task is already sitting at the target position
+    if (taskSourceColId === targetColumnId && srcIdx === adjustedInsert) {
+      insertAt = adjustedInsert + 1;
+      continue;
+    }
+
+    // ── Apply to virtual state then dispatch ────────────────────────────
+    // Virtual mutation must mirror exactly what the reducer will do so that
+    // the next iteration reads the correct indices.
+    virtual[taskSourceColId].splice(srcIdx, 1);
+    virtual[targetColumnId].splice(adjustedInsert, 0, taskId);
+
+    dispatch({
+      type: 'MOVE_TASK',
+      payload: {
+        sourceColumnId: taskSourceColId,
+        destColumnId: targetColumnId,
+        sourceIndex: srcIdx,
+        destIndex: adjustedInsert,
+      },
+    });
+
+    // Next task goes immediately after the one we just placed
+    insertAt = adjustedInsert + 1;
+  }
+}

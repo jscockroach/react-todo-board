@@ -190,6 +190,19 @@
   line-height: 1.4;
 }
 
+.dragPreviewCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #4a90e2;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 7px;
+  margin-right: 4px;
+}
+
 /*
  * Highlighted text segment — wraps the portion of a task title that matches
  * the current search query.  Uses a warm yellow background so it stands out
