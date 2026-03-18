@@ -181,19 +181,11 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
     }
 
     case 'MARK_SELECTED_COMPLETE': {
-      return updateSelectedTaskCompletion(
-        state,
-        action.payload.taskIds,
-        true,
-      );
+      return updateSelectedTaskCompletion(state, action.payload.taskIds, true);
     }
 
     case 'MARK_SELECTED_ACTIVE': {
-      return updateSelectedTaskCompletion(
-        state,
-        action.payload.taskIds,
-        false,
-      );
+      return updateSelectedTaskCompletion(state, action.payload.taskIds, false);
     }
 
     case 'MOVE_SELECTED': {
