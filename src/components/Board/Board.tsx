@@ -11,12 +11,16 @@ import { isColumnDropData, isColumnDragData } from '../Column/Column';
 import { SelectionProvider } from '../../context/SelectionContext';
 import { BulkActionBar } from '../BulkActionBar/BulkActionBar';
 import { ConfirmModalProvider } from '../../context/ConfirmModalContext';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import styles from './Board.module.css';
 
 /** Top-level board component. Renders all columns and handles all task and column moves. */
 export const Board: React.FC = () => {
   const { state, dispatch } = useBoardState();
   const stateRef = useRef(state);
+  const columnsWrapperRef = useRef<HTMLDivElement>(null);
+
+  useDragScroll(columnsWrapperRef);
 
   // Keep a ref to the latest board state so the drop handler always sees
   // up-to-date data without re-registering the monitor on each change.
@@ -123,7 +127,7 @@ export const Board: React.FC = () => {
             <SearchBar />
             <Filter />
           </div>
-          <div className={styles.columnsWrapper}>
+          <div className={styles.columnsWrapper} ref={columnsWrapperRef}>
             <div className={styles.columns}>
               {state.columnOrder.map((columnId) => {
                 const column = state.columns[columnId];

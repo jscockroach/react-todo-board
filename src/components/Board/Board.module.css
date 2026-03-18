@@ -26,6 +26,8 @@
   padding-bottom: 12px;
   min-height: 0;
   -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  touch-action: pan-x pan-y;
 }
 
 .columns {
@@ -33,10 +35,8 @@
   flex-direction: row;
   gap: 16px;
   align-items: flex-start;
-  /* let columns keep their natural width and scroll horizontally */
   width: max-content;
-  min-height: 100%;
-  padding: 4px 2px 8px;
+  padding: 4px 16px 8px;
 }
 
 /* ── Mobile ── */
