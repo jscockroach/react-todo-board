@@ -117,8 +117,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, columnId }) => {
   const { dispatch } = useBoardState();
   const { toggleTaskSelection, isSelected, selectedTaskIds } = useSelection();
   const { confirm } = useConfirm();
-  // Read the live search query so we can highlight matches in the title.
-  const { rawSearchQuery } = useFilter();
+  // Read the debounced search query so we can highlight matches in the title,
+  // keeping highlighting in sync with filtering.
+  const { debouncedSearchQuery: rawSearchQuery } = useFilter();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [isDragging, setIsDragging] = useState(false);
