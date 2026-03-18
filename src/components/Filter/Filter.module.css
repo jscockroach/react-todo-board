@@ -29,3 +29,10 @@
 .active:hover {
   background: #357abd;
 }
+
+@media (max-width: 500px) {
+  .filter,
+  .button {
+    width: 100%;
+  }
+}

@@ -122,12 +122,26 @@ export const Board: React.FC = () => {
     <ConfirmModalProvider>
       <SelectionProvider>
         <div className={styles.board}>
-          <BulkActionBar />
           <div className={styles.toolbar}>
             <SearchBar />
             <Filter />
           </div>
-          <div className={styles.columnsWrapper} ref={columnsWrapperRef}>
+          <div
+            className={styles.columnsWrapper}
+            ref={columnsWrapperRef}
+            onMouseDown={(e) => {
+              const target = e.target as HTMLElement;
+              // allow onBlur on click inside such elements
+              if (
+                !target.closest('input') &&
+                !target.closest('textarea') &&
+                !target.closest('button')
+              ) {
+                const active = document.activeElement as HTMLElement | null;
+                active?.blur();
+              }
+            }}
+          >
             <div className={styles.columns}>
               {state.columnOrder.map((columnId) => {
                 const column = state.columns[columnId];
@@ -143,6 +157,7 @@ export const Board: React.FC = () => {
               <AddColumn />
             </div>
           </div>
+          <BulkActionBar />
         </div>
       </SelectionProvider>
     </ConfirmModalProvider>

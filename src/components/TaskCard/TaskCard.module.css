@@ -47,7 +47,7 @@
 /* Faintly visible on any card hover — helps discoverability */
 .card:hover .checkboxContainer {
   width: 30px;
-  opacity: 0.25;
+  opacity: 0.4;
   pointer-events: auto;
 }
 
@@ -77,7 +77,6 @@
   word-break: break-word;
   line-height: 1.4;
   transition: color 0.15s;
-  cursor: text;
 }
 
 /* Completed state */
@@ -89,6 +88,10 @@
 .completed .title {
   text-decoration: line-through;
   color: #888;
+}
+
+.completed .menuWrapper {
+  opacity: 1;
 }
 
 .dragging {
@@ -108,6 +111,7 @@
 
 .editInput {
   flex: 1;
+  min-width: 0;
   font-size: 14px;
   padding: 2px 6px;
   border: 1px solid #4a90e2;
@@ -204,4 +208,30 @@
 /* Keep highlight visible (slightly muted) on completed / dimmed cards */
 .completed .highlight {
   background-color: #ffd54f;
+}
+
+.menuWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  letter-spacing: 1px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.menuBtn:hover {
+  color: #333;
+  background: #f0f0f0;
 }
