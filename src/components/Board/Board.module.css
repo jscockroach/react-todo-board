@@ -3,6 +3,11 @@
   flex-direction: column;
   height: 100vh;
   max-height: 100vh;
+  /* Use dynamic viewport units on supported browsers to avoid mobile 100vh issues */
+  height: 100svh;
+  max-height: 100svh;
+  height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   background: #f0f2f5;
 }
