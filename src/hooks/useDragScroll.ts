@@ -12,6 +12,9 @@ export function useDragScroll(ref: RefObject<HTMLElement | null>) {
     let scrollTop = 0;
 
     const onMouseDown = (e: MouseEvent) => {
+      // Only start drag-scroll for the primary (left) mouse button
+      if (e.button !== 0) return;
+
       // Only allow drag-scroll when clicking directly on the wrapper background
       // or the inner .columns div — not on any interactive/card content
       const target = e.target as HTMLElement;
