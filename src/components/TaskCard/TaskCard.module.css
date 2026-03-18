@@ -185,3 +185,23 @@
   opacity: 0.95;
   line-height: 1.4;
 }
+
+/*
+ * Highlighted text segment — wraps the portion of a task title that matches
+ * the current search query.  Uses a warm yellow background so it stands out
+ * against both normal and completed-task backgrounds without obscuring the
+ * underlying font colour.
+ */
+.highlight {
+  background-color: #ffe082;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  /* Reset browser <mark> defaults */
+  font: inherit;
+}
+
+/* Keep highlight visible (slightly muted) on completed / dimmed cards */
+.completed .highlight {
+  background-color: #ffd54f;
+}
