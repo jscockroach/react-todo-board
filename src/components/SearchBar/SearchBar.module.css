@@ -32,8 +32,16 @@
   display: flex;
   align-items: center;
   transition: color 0.15s;
+  margin-left: auto;
 }
 
 .clearButton:hover {
   color: #333;
+}
+
+@media (max-width: 500px) {
+  .searchBar,
+  .input {
+    width: 100%;
+  }
 }
