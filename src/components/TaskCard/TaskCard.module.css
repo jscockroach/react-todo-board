@@ -47,7 +47,6 @@
 /* Faintly visible on any card hover — helps discoverability */
 .card:hover .checkboxContainer {
   width: 30px;
-  opacity: 0.4;
   pointer-events: auto;
 }
 
@@ -103,10 +102,10 @@
   border-color: #4a90e2;
   background: #f0f6ff;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
-}
 
-.selectionMode .title {
-  /* Slightly muted when in selection mode to hint at select-primary interaction */
+  &:hover {
+    border-color: #4a90e2;
+  }
 }
 
 .editInput {

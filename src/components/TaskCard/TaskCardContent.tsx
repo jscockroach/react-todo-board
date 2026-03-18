@@ -72,28 +72,7 @@ export const TaskCardContent: React.FC<TaskCardContentProps> = ({
         aria-label={`Edit title for task "${title}"`}
       />
     ) : (
-      <span
-        className={styles.title}
-        title="Click to select"
-        role="button"
-        aria-pressed={completed}
-        aria-label={
-          completed
-            ? `Mark task "${title}" as active`
-            : `Mark task "${title}" as completed`
-        }
-        tabIndex={0}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          onEditStart();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onToggleComplete();
-          }
-        }}
-      >
+      <span className={styles.title} title="Click to select">
         {highlightText(title, searchQuery).map((segment, index) =>
           segment.highlight ? (
             <mark key={index} className={styles.highlight}>
