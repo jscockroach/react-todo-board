@@ -1,5 +1,20 @@
 import type { BoardState, BoardAction } from '../types/board';
 
+const updateSelectedTaskCompletion = (
+  state: BoardState,
+  taskIds: string[],
+  completed: boolean,
+): BoardState => {
+  const tasks = { ...state.tasks };
+  for (const id of taskIds) {
+    const task = tasks[id];
+    if (task) {
+      tasks[id] = { ...task, completed };
+    }
+  }
+  return { ...state, tasks };
+};
+
 const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
   switch (action.type) {
     case 'ADD_TASK': {
@@ -166,14 +181,11 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
     }
 
     case 'MARK_SELECTED_COMPLETE': {
-      const ids = new Set(action.payload.taskIds);
-      const newTasks = Object.fromEntries(
-        Object.entries(state.tasks).map(([id, task]) => [
-          id,
-          ids.has(id) ? { ...task, completed: true } : task,
-        ]),
-      );
-      return { ...state, tasks: newTasks };
+      return updateSelectedTaskCompletion(state, action.payload.taskIds, true);
+    }
+
+    case 'MARK_SELECTED_ACTIVE': {
+      return updateSelectedTaskCompletion(state, action.payload.taskIds, false);
     }
 
     case 'MOVE_SELECTED': {

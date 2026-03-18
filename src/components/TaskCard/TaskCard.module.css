@@ -47,6 +47,7 @@
 /* Faintly visible on any card hover — helps discoverability */
 .card:hover .checkboxContainer {
   width: 30px;
+  opacity: 0.9;
   pointer-events: auto;
 }
 
