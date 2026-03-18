@@ -43,7 +43,6 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     <div
       className={styles.menu}
       ref={menuRef}
-      role="menu"
       style={{
         top: position.top,
         right: position.right,
@@ -57,7 +56,6 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
           className={[styles.item, item.danger ? styles.danger : '']
             .filter(Boolean)
             .join(' ')}
-          role="menuitem"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={() => {
             item.onClick();
