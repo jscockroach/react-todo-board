@@ -128,10 +128,26 @@ export const useTaskDrag = ({
           { ...baseData, draggedTaskIds: [taskId] } as Record<string, unknown>,
           { input, element: dragEl, allowedEdges: ['top', 'bottom'] },
         ),
-      // Prevent a card from becoming a drop target for itself.
-      canDrop: ({ source }) =>
-        isTaskDragData(source.data as Record<string, unknown>) &&
-        source.data.taskId !== taskId,
+      // Prevent a card from becoming a drop target for itself or any
+      // of the tasks currently being dragged in a multi-select.
+      canDrop: ({ source }) => {
+        if (!isTaskDragData(source.data as Record<string, unknown>)) {
+          return false;
+        }
+        const data = source.data as TaskDragData;
+        // Block dropping onto the primary dragged task.
+        if (data.taskId === taskId) {
+          return false;
+        }
+        // Also block dropping onto any other dragged/selected task.
+        if (
+          Array.isArray(data.draggedTaskIds) &&
+          data.draggedTaskIds.includes(taskId)
+        ) {
+          return false;
+        }
+        return true;
+      },
       onDragEnter({ self }) {
         setClosestEdge(extractClosestEdge(self.data));
       },
