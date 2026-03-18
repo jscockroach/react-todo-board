@@ -9,6 +9,29 @@ Live: https://react-todo-board-demo.vercel.app/
 
 ---
 
+## ⚠️ Development approach
+
+This project was developed with the help of AI tools (including agent-based workflows) to speed up implementation and explore solutions more efficiently.
+
+AI was used as an assistant for:
+
+- generating boilerplate and repetitive code
+- exploring architectural approaches
+- refining implementation details
+
+All final decisions, code structure, and feature implementations were reviewed and adjusted manually.
+
+Additionally, a minimal CI setup was configured to ensure code quality:
+
+- **Husky** for git hooks
+- Pre-commit / pre-push checks:
+  - ESLint
+  - TypeScript type checking
+  - Prettier formatting
+- Automated code review via GitHub Copilot
+
+---
+
 ## 🛠 Tech stack
 
 - React + TypeScript

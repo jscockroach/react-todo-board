@@ -41,6 +41,12 @@ export const BulkActionBar: React.FC = () => {
     clearSelection();
   };
 
+  const handleBulkStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === 'complete') handleMarkComplete();
+    else if (e.target.value === 'active') handleMarkActive();
+    e.target.value = '';
+  };
+
   return (
     <div
       className={[styles.bar, visible ? styles.visible : styles.hidden].join(
@@ -63,11 +69,7 @@ export const BulkActionBar: React.FC = () => {
             id="bulk-status-select"
             className={styles.moveSelect}
             defaultValue=""
-            onChange={(e) => {
-              if (e.target.value === 'complete') handleMarkComplete();
-              else if (e.target.value === 'active') handleMarkActive();
-              e.target.value = '';
-            }}
+            onChange={handleBulkStatus}
           >
             <option value="" disabled>
               Status…
