@@ -176,6 +176,17 @@ const boardReducer = (state: BoardState, action: BoardAction): BoardState => {
       return { ...state, tasks: newTasks };
     }
 
+    case 'MARK_SELECTED_ACTIVE': {
+      const ids = new Set(action.payload.taskIds);
+      const newTasks = Object.fromEntries(
+        Object.entries(state.tasks).map(([id, task]) => [
+          id,
+          ids.has(id) ? { ...task, completed: false } : task,
+        ]),
+      );
+      return { ...state, tasks: newTasks };
+    }
+
     case 'MOVE_SELECTED': {
       const { taskIds, toColumnId } = action.payload;
       const ids = new Set(taskIds);

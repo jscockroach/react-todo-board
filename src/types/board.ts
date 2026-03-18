@@ -42,6 +42,7 @@ export type BoardAction =
     }
   | { type: 'DELETE_SELECTED'; payload: { taskIds: string[] } }
   | { type: 'MARK_SELECTED_COMPLETE'; payload: { taskIds: string[] } }
+  | { type: 'MARK_SELECTED_ACTIVE'; payload: { taskIds: string[] } }
   | {
       type: 'MOVE_SELECTED';
       payload: { taskIds: string[]; toColumnId: string };

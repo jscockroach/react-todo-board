@@ -29,6 +29,12 @@ export const BulkActionBar: React.FC = () => {
     clearSelection();
   };
 
+  const handleMarkActive = () => {
+    const ids = Array.from(selectedTaskIds);
+    dispatch({ type: 'MARK_SELECTED_ACTIVE', payload: { taskIds: ids } });
+    clearSelection();
+  };
+
   const handleMoveTo = (toColumnId: string) => {
     const ids = Array.from(selectedTaskIds);
     dispatch({ type: 'MOVE_SELECTED', payload: { taskIds: ids, toColumnId } });
@@ -49,13 +55,27 @@ export const BulkActionBar: React.FC = () => {
       </span>
 
       <div className={styles.actions}>
-        <button
-          className={styles.actionBtn}
-          onClick={handleMarkComplete}
-          title="Mark all selected as complete"
-        >
-          ✔ Mark Complete
-        </button>
+        <div className={styles.moveWrapper}>
+          <label htmlFor="bulk-status-select" className={styles.moveLabel}>
+            Set status:
+          </label>
+          <select
+            id="bulk-status-select"
+            className={styles.moveSelect}
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value === 'complete') handleMarkComplete();
+              else if (e.target.value === 'active') handleMarkActive();
+              e.target.value = '';
+            }}
+          >
+            <option value="" disabled>
+              Status…
+            </option>
+            <option value="complete">✔ Mark complete</option>
+            <option value="active">↩ Mark active</option>
+          </select>
+        </div>
 
         <div className={styles.moveWrapper}>
           <label htmlFor="bulk-move-select" className={styles.moveLabel}>

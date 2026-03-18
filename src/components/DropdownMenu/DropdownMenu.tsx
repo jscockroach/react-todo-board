@@ -25,7 +25,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   useEffect(() => {
     // Remember the element that was focused before the menu opened.
-    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+    previouslyFocusedElementRef.current =
+      document.activeElement as HTMLElement | null;
 
     // Move focus into the menu (prefer the first menu item).
     if (menuRef.current) {
